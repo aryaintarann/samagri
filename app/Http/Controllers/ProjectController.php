@@ -8,9 +8,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Notifications\ProjectAssigned;
 use Illuminate\Support\Facades\Notification;
+use App\Traits\LogsActivity;
 
 class ProjectController extends Controller
 {
+    use LogsActivity;
     /**
      * Display a listing of the resource.
      */
@@ -59,6 +61,8 @@ class ProjectController extends Controller
             $validated['active'] = true;
 
         $project = Project::create($validated);
+
+        $this->logActivity('Created Project', 'Created project: ' . $project->name);
 
         // Sync Assignees (Team)
         if ($request->has('assignees')) {
@@ -149,7 +153,9 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
+        $name = $project->name;
         $project->delete();
+        $this->logActivity('Deleted Project', 'Deleted project: ' . $name);
 
         if (request()->ajax()) {
             return response()->json(['message' => 'Project deleted successfully']);

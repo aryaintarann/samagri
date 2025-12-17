@@ -6,9 +6,11 @@ use App\Models\Invoice;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Traits\LogsActivity;
 
 class InvoiceController extends Controller
 {
+    use LogsActivity;
     /**
      * Display a listing of the resource.
      */
@@ -43,6 +45,7 @@ class InvoiceController extends Controller
         $validated['invoice_number'] = 'INV-' . time();
 
         $invoice = Invoice::create($validated);
+        $this->logActivity('Created Invoice', 'Created invoice ' . $invoice->invoice_number . ' for project: ' . $invoice->project->name);
 
         if ($request->ajax()) {
             return response()->json(['message' => 'Invoice created successfully', 'invoice' => $invoice]);
@@ -87,6 +90,7 @@ class InvoiceController extends Controller
         ]);
 
         $invoice->update($validated);
+        $this->logActivity('Updated Invoice', 'Updated invoice ' . $invoice->invoice_number . ' status to: ' . $invoice->status);
 
         if ($request->ajax()) {
             return response()->json(['message' => 'Invoice updated successfully', 'invoice' => $invoice]);
@@ -100,7 +104,9 @@ class InvoiceController extends Controller
      */
     public function destroy(Invoice $invoice)
     {
+        $number = $invoice->invoice_number;
         $invoice->delete();
+        $this->logActivity('Deleted Invoice', 'Deleted invoice: ' . $number);
 
         if (request()->ajax()) {
             return response()->json(['message' => 'Invoice deleted successfully']);

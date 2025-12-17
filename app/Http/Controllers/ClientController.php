@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use Illuminate\Http\Request;
+use App\Traits\LogsActivity;
 
 class ClientController extends Controller
 {
+    use LogsActivity;
     /**
      * Display a listing of the resource.
      */
@@ -38,6 +40,7 @@ class ClientController extends Controller
         ]);
 
         $client = Client::create($validated);
+        $this->logActivity('Created Client', 'Added new client: ' . $client->name);
 
         if ($request->ajax()) {
             return response()->json(['message' => 'Client created successfully', 'client' => $client]);
