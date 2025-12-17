@@ -1,10 +1,5 @@
 <x-app-layout>
     <div class="space-y-6">
-        <!-- Page Title -->
-        <h2 class="font-semibold text-2xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-
         <!-- Stats Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Active Projects -->

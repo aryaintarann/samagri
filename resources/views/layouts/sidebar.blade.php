@@ -1,20 +1,10 @@
 <aside class="w-64 bg-white text-gray-800 min-h-screen flex flex-col transition-all duration-300 shadow-xl z-10">
-    <div class="h-16 flex items-center justify-center font-bold text-xl border-b border-gray-100 bg-white">
+    <div class="h-16 flex items-center justify-center font-bold text-xl bg-white mt-4">
         <span class="text-blue-600 mr-2 text-2xl"><i class="fas fa-layer-group"></i></span>
-        <span class="tracking-wide">BizManager</span>
+        <span class="tracking-wide text-gray-800">BizManager</span>
     </div>
 
-    <!-- User Info -->
-    <div class="p-6 border-b border-gray-100 bg-gray-50/50 flex items-center space-x-4">
-        <div
-            class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-lg font-bold text-blue-600 shadow-sm border border-blue-200">
-            {{ substr(auth()->user()->name, 0, 1) }}
-        </div>
-        <div class="flex-1 min-w-0">
-            <div class="text-sm font-bold text-gray-900 truncate">{{ auth()->user()->name }}</div>
-            <div class="text-xs text-gray-500 truncate">{{ auth()->user()->role }}</div>
-        </div>
-    </div>
+    <!-- Profile removed as per request -->
 
     <nav class="flex-1 overflow-y-auto py-6 space-y-1">
         <a href="{{ route('dashboard') }}"

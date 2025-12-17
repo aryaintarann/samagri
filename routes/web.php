@@ -7,6 +7,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\SopController;
 use App\Http\Controllers\FinanceController;
+use App\Http\Controllers\GlobalSearchController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -24,6 +25,7 @@ Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'download'
 Route::resource('invoices', InvoiceController::class)->middleware(['auth', 'verified']);
 Route::resource('sops', SopController::class)->middleware(['auth', 'verified']);
 Route::get('/finance', [FinanceController::class, 'index'])->middleware(['auth', 'verified'])->name('finance.index');
+Route::get('/global-search', [GlobalSearchController::class, 'index'])->middleware(['auth', 'verified'])->name('global.search');
 Route::post('/finance/expenses', [FinanceController::class, 'storeExpense'])->middleware(['auth', 'verified'])->name('finance.expenses.store');
 Route::delete('/finance/expenses/{expense}', [FinanceController::class, 'destroyExpense'])->middleware(['auth', 'verified'])->name('finance.expenses.destroy');
 
