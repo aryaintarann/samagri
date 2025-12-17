@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\Client;
+use App\Models\User;
 use Illuminate\Http\Request;
+use App\Notifications\ProjectAssigned;
+use Illuminate\Support\Facades\Notification;
 
 class ProjectController extends Controller
 {
@@ -13,11 +16,14 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        // Eager load client
-        $projects = Project::with('client')->latest()->get();
+        // Eager load client and users (team)
+        $projects = Project::with(['client', 'users'])->latest()->get();
         // Pass clients for the Create Modal
         $clients = Client::all();
-        return view('projects.index', compact('projects', 'clients'));
+        // Fetch users grouped by role for assignment
+        $usersByRole = User::all()->groupBy('role');
+        $roles = User::select('role')->distinct()->pluck('role');
+        return view('projects.index', compact('projects', 'clients', 'usersByRole', 'roles'));
     }
 
     /**
@@ -43,7 +49,8 @@ class ProjectController extends Controller
             'deadline' => 'nullable|date',
             'budget' => 'nullable|numeric',
             'description' => 'nullable|string',
-            'active' => 'boolean'
+            'active' => 'boolean',
+            'user_id' => 'nullable|exists:users,id',
         ]);
 
         // Ensure active is boolean
@@ -53,8 +60,19 @@ class ProjectController extends Controller
 
         $project = Project::create($validated);
 
+        // Sync Assignees (Team)
+        if ($request->has('assignees')) {
+            // Filter out empty values
+            $assignees = array_filter($request->assignees);
+            $project->users()->sync($assignees);
+
+            // Notify assigned users
+            $users = User::whereIn('id', $assignees)->get();
+            Notification::send($users, new ProjectAssigned($project));
+        }
+
         if ($request->ajax()) {
-            return response()->json(['message' => 'Project created successfully', 'project' => $project]);
+            return response()->json(['message' => 'Project created successfully', 'project' => $project->load('users')]);
         }
 
         return redirect()->route('projects.index')->with('success', 'Project created successfully.');
@@ -92,7 +110,8 @@ class ProjectController extends Controller
             'deadline' => 'nullable|date',
             'budget' => 'nullable|numeric',
             'description' => 'nullable|string',
-            'active' => 'boolean'
+            'active' => 'boolean',
+            'user_id' => 'nullable|exists:users,id',
         ]);
 
         $validated['active'] = $request->has('active') ? true : false;
@@ -101,8 +120,25 @@ class ProjectController extends Controller
 
         $project->update($validated);
 
+        // Sync Assignees (Team)
+        if ($request->has('assignees')) {
+            $assignees = array_filter($request->assignees);
+
+            // Notify only new assignees (optional logic, but simple is notify all on change)
+            // Let's notify newly attached ones for better UX.
+            $currentIds = $project->users()->pluck('user_id')->toArray();
+            $newIds = array_diff($assignees, $currentIds);
+
+            $project->users()->sync($assignees);
+
+            if (!empty($newIds)) {
+                $users = User::whereIn('id', $newIds)->get();
+                Notification::send($users, new ProjectAssigned($project));
+            }
+        }
+
         if ($request->ajax()) {
-            return response()->json(['message' => 'Project updated successfully', 'project' => $project]);
+            return response()->json(['message' => 'Project updated successfully', 'project' => $project->load('users')]);
         }
 
         return redirect()->route('projects.index')->with('success', 'Project updated successfully.');

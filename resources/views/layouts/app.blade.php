@@ -46,11 +46,69 @@
                     </div>
 
                     <!-- Notifications -->
-                    <button class="relative p-2 text-gray-400 hover:text-indigo-600 transition-colors">
-                        <i class="far fa-bell text-xl"></i>
-                        <span
-                            class="absolute top-1.5 right-1.5 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-                    </button>
+                    <!-- Notifications -->
+                    <div class="relative group" x-data="{ open: false }">
+                        <button @click="open = !open" @click.away="open = false"
+                            class="relative p-2 text-gray-400 hover:text-indigo-600 transition-colors">
+                            <i class="far fa-bell text-xl"></i>
+                            @if(auth()->user()->unreadNotifications->count() > 0)
+                                <span
+                                    class="absolute top-1.5 right-1.5 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                            @endif
+                        </button>
+
+                        <!-- Dropdown -->
+                        <div x-show="open" style="display: none;" x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                            class="origin-top-right absolute right-0 mt-2 w-80 rounded-xl shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+                            <div class="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+                                <span class="font-semibold text-gray-700">Notifications</span>
+                                @if(auth()->user()->unreadNotifications->count() > 0)
+                                    <button
+                                        @click="fetch('{{ route('notifications.readAll') }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } }).then(() => { window.location.reload(); })"
+                                        class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">Mark all
+                                        read</button>
+                                @endif
+                            </div>
+                            <div class="max-h-64 overflow-y-auto">
+                                @forelse(auth()->user()->unreadNotifications as $notification)
+                                    <div @click="fetch('{{ route('notifications.read', $notification->id) }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } }).then(() => { window.location.href = '#'; /* Add link to project if needed */ })"
+                                        class="block px-4 py-3 hover:bg-gray-50 transition border-b border-gray-50 last:border-0 relative group cursor-pointer">
+                                        <div class="flex items-start">
+                                            <div class="flex-shrink-0 mt-1">
+                                                <div
+                                                    class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                                                    <i class="fas fa-briefcase text-xs"></i>
+                                                </div>
+                                            </div>
+                                            <div class="ml-3 w-0 flex-1">
+                                                <p class="text-sm text-gray-800 font-medium">
+                                                    {{ $notification->data['message'] ?? 'New Notification' }}</p>
+                                                <p class="text-xs text-gray-400 mt-1">
+                                                    {{ $notification->created_at->diffForHumans() }}</p>
+                                            </div>
+                                            <div class="ml-auto pl-3">
+                                                <button
+                                                    @click.stop="fetch('{{ route('notifications.read', $notification->id) }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } }).then(() => { window.location.reload(); })"
+                                                    class="text-gray-400 hover:text-indigo-600" title="Mark as read">
+                                                    <i class="fas fa-check text-xs"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="px-4 py-8 text-center text-gray-500">
+                                        <i class="far fa-bell-slash text-2xl text-gray-300 mb-2 block"></i>
+                                        <p class="text-sm">No new notifications</p>
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- User Profile -->
                     <a href="{{ route('profile.edit') }}"

@@ -20,6 +20,11 @@ class Project extends Model
         return $this->belongsTo(Client::class);
     }
 
+    public function users(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(User::class)->withTimestamps();
+    }
+
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);

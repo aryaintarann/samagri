@@ -48,7 +48,7 @@
                             </span>
                             <span
                                 class="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wider
-                                                {{ $project->status === 'Completed' ? 'bg-green-100 text-green-800' : ($project->status === 'In Progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800') }}">
+                                                                                                                        {{ $project->status === 'Completed' ? 'bg-green-100 text-green-800' : ($project->status === 'In Progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800') }}">
                                 {{ $project->status }}
                             </span>
                         </div>
@@ -71,6 +71,23 @@
                                 <i class="fas fa-calendar-alt mr-1 text-red-400"></i>
                                 {{ $project->deadline ? \Carbon\Carbon::parse($project->deadline)->format('M d, Y') : 'No Deadline' }}
                             </div>
+                        </div>
+
+                        <div class="mt-4 flex items-center -space-x-2 overflow-hidden">
+                            @forelse($project->users->take(4) as $user)
+                                <div class="h-8 w-8 rounded-full ring-2 ring-white bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600 cursor-help"
+                                    title="{{ $user->name }} ({{ $user->role }})">
+                                    {{ substr($user->name, 0, 2) }}
+                                </div>
+                            @empty
+                                <span class="text-xs text-gray-400 italic ml-2">No active team</span>
+                            @endforelse
+                            @if($project->users->count() > 4)
+                                <div
+                                    class="h-8 w-8 rounded-full ring-2 ring-white bg-gray-100 flex items-center justify-center text-xs text-gray-500">
+                                    +{{ $project->users->count() - 4 }}
+                                </div>
+                            @endif
                         </div>
                     </div>
 
@@ -137,6 +154,25 @@
                                 <input type="text" name="name" id="name"
                                     class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-3"
                                     required>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                @foreach($roles as $role)
+                                    <div>
+                                        <label for="assignee_{{ Str::slug($role) }}"
+                                            class="block text-sm font-medium text-gray-700 mb-2">{{ $role }}</label>
+                                        <select name="assignees[]" id="assignee_{{ Str::slug($role) }}"
+                                            class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-3 role-dropdown"
+                                            data-role="{{ $role }}">
+                                            <option value="">Select {{ $role }}</option>
+                                            @if(isset($usersByRole[$role]))
+                                                @foreach($usersByRole[$role] as $user)
+                                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                    </div>
+                                @endforeach
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -237,6 +273,8 @@
                 title.innerText = 'Add Project';
                 form.reset();
                 document.getElementById('projectId').value = '';
+                // Reset all role dropdowns
+                document.querySelectorAll('.role-dropdown').forEach(dd => dd.value = '');
                 document.getElementById('active').checked = true;
             } else if (mode === 'edit' && data) {
                 title.innerText = 'Edit Project';
@@ -247,6 +285,23 @@
                 document.getElementById('budget').value = data.budget;
                 document.getElementById('deadline').value = data.deadline ? data.deadline.substring(0, 10) : '';
                 document.getElementById('description').value = data.description || '';
+                // document.getElementById('user_id').value = data.user_id || ''; // Removed
+
+                // Populate role dropdowns
+                if (data.users && data.users.length > 0) {
+                    data.users.forEach(user => {
+                        // Find dropdown with data-role matching user's role
+                        // We need a robust way to match. The loop uses $role, user has role column.
+                        // Assuming user.role matches the $role strings exactly.
+                        const dropdowns = document.querySelectorAll('.role-dropdown');
+                        dropdowns.forEach(dd => {
+                            if (dd.getAttribute('data-role') === user.role) {
+                                dd.value = user.id;
+                            }
+                        });
+                    });
+                }
+
                 document.getElementById('active').checked = data.active == 1;
             }
         }
@@ -262,7 +317,23 @@
             const id = formData.get('id');
             const url = id ? `/projects/${id}` : '/projects';
 
-            const data = Object.fromEntries(formData.entries());
+            const data = {};
+            formData.forEach((value, key) => {
+                // Check if key is an array (ends with [])
+                if (key.endsWith('[]')) {
+                    const cleanKey = key.slice(0, -2);
+                    if (!data[cleanKey]) {
+                        data[cleanKey] = [];
+                    }
+                    data[cleanKey].push(value);
+                } else {
+                    data[key] = value;
+                }
+            });
+
+            // Handle assignees specifically if using named indexes assignees[role] or strict arrays
+            // If the inputs are name="assignees[]", the above loop handles it into data['assignees'] array.
+
             data.active = document.getElementById('active').checked;
 
             try {
