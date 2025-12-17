@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\LoginHistory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -24,11 +26,40 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
+        try {
+            $request->authenticate();
 
-        $request->session()->regenerate();
+            // Log Success
+            LoginHistory::create([
+                'user_id' => Auth::id(),
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'status' => 'success',
+            ]);
 
-        return redirect()->intended(route('dashboard', absolute: false));
+            $request->session()->regenerate();
+
+            return redirect()->intended(route('dashboard', absolute: false));
+
+        } catch (ValidationException $e) {
+            // Log Failure
+            // Determine if it was a lockout or just bad credentials
+            $status = 'failed';
+            if (str_contains(json_encode($e->errors()), 'throttle')) {
+                $status = 'lockout';
+            }
+
+            // We might not have a user_id if login failed, but we can try to find user by email if we wanted to be invasive.
+            // For now, tracking IP is key.
+            LoginHistory::create([
+                'user_id' => null, // Optional: look up user by email if needed, but privacy constraints usually apply.
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'status' => $status,
+            ]);
+
+            throw $e;
+        }
     }
 
     /**
