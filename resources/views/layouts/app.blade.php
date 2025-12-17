@@ -53,10 +53,10 @@
                     </button>
 
                     <!-- User Profile -->
-                    <div
-                        class="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-md cursor-pointer hover:shadow-lg transition-transform transform hover:scale-105">
+                    <a href="{{ route('profile.edit') }}"
+                        class="h-10 w-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold shadow-sm cursor-pointer hover:bg-indigo-700 transition-colors">
                         {{ substr(auth()->user()->name, 0, 2) }}
-                    </div>
+                    </a>
                 </div>
             </header>
 
