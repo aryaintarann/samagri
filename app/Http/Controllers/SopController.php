@@ -37,8 +37,12 @@ class SopController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'category' => 'nullable|string|max:50',
+            'is_required' => 'boolean'
         ]);
 
+        $validated['category'] = $validated['category'] ?? 'General';
+        $validated['is_required'] = $request->has('is_required'); // Checkbox handling
         $validated['created_by'] = auth()->id();
 
         $sop = Sop::create($validated);
@@ -89,7 +93,12 @@ class SopController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'category' => 'nullable|string|max:50',
+            'is_required' => 'boolean'
         ]);
+
+        $validated['category'] = $validated['category'] ?? 'General';
+        $validated['is_required'] = $request->has('is_required');
 
         $sop->update($validated);
 

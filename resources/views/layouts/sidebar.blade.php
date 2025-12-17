@@ -51,7 +51,7 @@
             class="flex items-center px-6 py-3.5 transition-all duration-200 group {{ request()->routeIs('sops.*') ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600 hover:pl-7' }}">
             <i
                 class="fas fa-book w-6 text-center mr-3 {{ request()->routeIs('sops.*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-500' }}"></i>
-            <span class="font-medium">SOPs</span>
+            <span class="font-medium">Knowledge Base</span>
         </a>
 
         <a href="{{ route('clients.index') }}"

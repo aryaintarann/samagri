@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Sop extends Model
 {
-    protected $guarded = [];
+    protected $guarded = []; // Allow mass assignment for simplicity, or specify fillable including 'category', 'is_required'
 
     public function creator(): BelongsTo
     {
