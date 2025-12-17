@@ -15,8 +15,16 @@ class InvoiceController extends Controller
     public function index()
     {
         $invoices = Invoice::with('project.client')->latest()->get();
-        $projects = Project::where('active', true)->get(); // Only active projects for new invoices
+        $projects = Project::all(); // Fetch all projects to ensure edit works for inactive ones
         return view('invoices.index', compact('invoices', 'projects'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return redirect()->route('invoices.index');
     }
 
     /**

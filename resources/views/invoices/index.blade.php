@@ -41,42 +41,41 @@
                     <tbody>
                         @foreach($invoices as $invoice)
                             <tr class="hover:bg-gray-50 :bg-gray-700 transition">
-                                <td
-                                    class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
+                                <td class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
                                     <p class="text-gray-900  whitespace-no-wrap font-bold">
-                                        {{ $invoice->invoice_number }}</p>
+                                        {{ $invoice->invoice_number }}
+                                    </p>
                                 </td>
-                                <td
-                                    class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
+                                <td class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
                                     <p class="text-gray-900  whitespace-no-wrap">
-                                        {{ $invoice->project->name }}</p>
+                                        {{ $invoice->project->name }}
+                                    </p>
                                 </td>
-                                <td
-                                    class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
+                                <td class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
                                     <p class="text-gray-900  whitespace-no-wrap">
-                                        {{ $invoice->project->client->name }}</p>
+                                        {{ $invoice->project->client->name }}
+                                    </p>
                                 </td>
-                                <td
-                                    class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
+                                <td class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
                                     <p class="text-gray-900  whitespace-no-wrap font-mono">
-                                        ${{ number_format($invoice->amount, 2) }}</p>
+                                        Rp {{ number_format($invoice->amount, 0, ',', '.') }}</p>
                                 </td>
-                                <td
-                                    class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
-                                    <span class="relative inline-block px-3 py-1 font-semibold leading-tight 
-                                        {{ $invoice->status === 'Paid' ? 'text-green-900' : 'text-red-900' }}">
-                                        <span aria-hidden class="absolute inset-0 opacity-50 rounded-full 
-                                            {{ $invoice->status === 'Paid' ? 'bg-green-200' : 'bg-red-200' }}"></span>
+                                <td class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
+                                    <span
+                                        class="relative inline-block px-3 py-1 font-semibold leading-tight 
+                                                            {{ $invoice->status === 'Paid' ? 'text-green-900' : 'text-red-900' }}">
+                                        <span aria-hidden
+                                            class="absolute inset-0 opacity-50 rounded-full 
+                                                                {{ $invoice->status === 'Paid' ? 'bg-green-200' : 'bg-red-200' }}"></span>
                                         <span class="relative">{{ $invoice->status }}</span>
                                     </span>
                                 </td>
-                                <td
-                                    class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
+                                <td class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
                                     <p class="text-gray-900  whitespace-no-wrap">
-                                        {{ $invoice->due_date ? $invoice->due_date->format('M d, Y') : '-' }}</p>
+                                        {{ $invoice->due_date ? $invoice->due_date->format('M d, Y') : '-' }}
+                                    </p>
                                 </td>
-                                <td
-                                    class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
+                                <td class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
                                     <a href="{{ route('invoices.download', $invoice->id) }}"
                                         class="text-gray-500 hover:text-gray-700 mr-3 transition" title="Download PDF"><i
                                             class="fas fa-download"></i></a>
@@ -113,8 +112,8 @@
                     <div class="bg-white  px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div class="sm:flex sm:items-start">
                             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900 "
-                                    id="modalTitle">Create Invoice</h3>
+                                <h3 class="text-lg leading-6 font-medium text-gray-900 " id="modalTitle">Create Invoice
+                                </h3>
                                 <div class="mt-4 space-y-4">
                                     <div>
                                         <label for="project_id"
@@ -130,9 +129,8 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <label for="amount"
-                                            class="block text-sm font-medium text-gray-700 ">Amount
-                                            ($)</label>
+                                        <label for="amount" class="block text-sm font-medium text-gray-700 ">Amount
+                                            (Rp)</label>
                                         <input type="number" step="0.01" name="amount" id="amount"
                                             class="mt-1 block w-full rounded-md border-gray-300   shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                                             required>
@@ -147,8 +145,7 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <label for="due_date"
-                                            class="block text-sm font-medium text-gray-700 ">Due
+                                        <label for="due_date" class="block text-sm font-medium text-gray-700 ">Due
                                             Date</label>
                                         <input type="date" name="due_date" id="due_date"
                                             class="mt-1 block w-full rounded-md border-gray-300   shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
@@ -208,7 +205,8 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
                     },
                     body: JSON.stringify(data)
                 });
@@ -229,7 +227,10 @@
         async function editInvoice(id) {
             try {
                 const response = await fetch(`/invoices/${id}/edit`, {
-                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
                 });
                 const data = await response.json();
                 openModal('edit', data);
@@ -254,7 +255,8 @@
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
                         .then(response => response.json())

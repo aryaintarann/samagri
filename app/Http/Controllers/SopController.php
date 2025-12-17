@@ -17,6 +17,14 @@ class SopController extends Controller
     }
 
     /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return redirect()->route('sops.index');
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
@@ -50,7 +58,7 @@ class SopController extends Controller
         if (request()->ajax()) {
             return response()->json($sop);
         }
-        return view('sops.show', compact('sop'));
+        return redirect()->route('sops.index');
     }
 
     /**

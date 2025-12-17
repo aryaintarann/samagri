@@ -64,7 +64,7 @@
                                 <td
                                     class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
                                     <p class="text-gray-900  whitespace-no-wrap">
-                                        ${{ number_format($project->budget, 2) }}</p>
+                                        Rp {{ number_format($project->budget, 0, ',', '.') }}</p>
                                 </td>
                                 <td
                                     class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
@@ -232,7 +232,8 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
                     },
                     body: JSON.stringify(data)
                 });
@@ -252,10 +253,11 @@
 
         async function editProject(id) {
             try {
-                const response = await fetch(`/projects/${id}/edit`, { // Using /edit route or directly API if available. 
-                    // Wait, usually resource controller returns VIEW for edit. 
-                    // I modified ProjectController to return JSON if ajax request on edit()
-                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                const response = await fetch(`/projects/${id}/edit`, { 
+                    headers: { 
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
                 });
                 const data = await response.json();
                 openModal('edit', data);
@@ -280,7 +282,8 @@
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
                         .then(response => response.json())

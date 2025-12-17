@@ -34,23 +34,21 @@
                     <tbody>
                         @foreach($sops as $sop)
                             <tr class="hover:bg-gray-50 :bg-gray-700 transition">
-                                <td
-                                    class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
+                                <td class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
                                     <p class="text-gray-900  whitespace-no-wrap font-bold">
-                                        {{ $sop->title }}</p>
+                                        {{ $sop->title }}
+                                    </p>
                                 </td>
-                                <td
-                                    class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
+                                <td class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
                                     <p class="text-gray-900  whitespace-no-wrap">{{ $sop->creator->name }}
                                     </p>
                                 </td>
-                                <td
-                                    class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
+                                <td class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
                                     <p class="text-gray-900  whitespace-no-wrap">
-                                        {{ $sop->created_at->format('M d, Y') }}</p>
+                                        {{ $sop->created_at->format('M d, Y') }}
+                                    </p>
                                 </td>
-                                <td
-                                    class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
+                                <td class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
                                     <button onclick="viewSop({{ $sop->id }})"
                                         class="text-blue-500 hover:text-blue-700 mr-3 transition"><i
                                             class="fas fa-eye"></i></button>
@@ -89,8 +87,7 @@
                     <div class="bg-white  px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div class="sm:flex sm:items-start">
                             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900 "
-                                    id="modalTitle">Add SOP</h3>
+                                <h3 class="text-lg leading-6 font-medium text-gray-900 " id="modalTitle">Add SOP</h3>
                                 <div class="mt-4 space-y-4">
                                     <div>
                                         <label for="title"
@@ -134,8 +131,7 @@
                 <div class="bg-white  px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <h3 class="text-2xl leading-6 font-bold text-gray-900  mb-4" id="viewSopTitle">
                     </h3>
-                    <div class="prose  max-w-none text-gray-700  whitespace-pre-wrap"
-                        id="viewSopContent"></div>
+                    <div class="prose  max-w-none text-gray-700  whitespace-pre-wrap" id="viewSopContent"></div>
                 </div>
                 <div class="bg-gray-50  px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                     <button type="button"
@@ -188,7 +184,8 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
                     },
                     body: JSON.stringify(data)
                 });
@@ -226,7 +223,10 @@
         async function viewSop(id) {
             try {
                 const response = await fetch(`/sops/${id}`, {
-                    headers: { 'Accept': 'application/json' }
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
                 });
                 const data = await response.json();
                 document.getElementById('viewSopTitle').innerText = data.title;
@@ -253,7 +253,8 @@
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
                         .then(response => {

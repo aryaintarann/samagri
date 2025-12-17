@@ -13,16 +13,14 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Project Info -->
             <div class="col-span-2 bg-white  overflow-hidden shadow-sm rounded-lg">
-                <div
-                    class="p-6 border-b border-gray-100  font-bold text-lg text-gray-800 ">
+                <div class="p-6 border-b border-gray-100  font-bold text-lg text-gray-800 ">
                     Project Information
                 </div>
                 <div class="p-6 space-y-4">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <span class="block text-sm text-gray-500 ">Client</span>
-                            <span
-                                class="block text-lg font-semibold text-gray-800 ">{{ $project->client->name }}</span>
+                            <span class="block text-lg font-semibold text-gray-800 ">{{ $project->client->name }}</span>
                         </div>
                         <div>
                             <span class="block text-sm text-gray-500 ">Status</span>
@@ -34,8 +32,8 @@
                         </div>
                         <div>
                             <span class="block text-sm text-gray-500 ">Budget</span>
-                            <span
-                                class="block text-lg font-semibold text-gray-800 ">${{ number_format($project->budget, 2) }}</span>
+                            <span class="block text-lg font-semibold text-gray-800 ">Rp
+                                {{ number_format($project->budget, 0, ',', '.') }}</span>
                         </div>
                         <div>
                             <span class="block text-sm text-gray-500 ">Deadline</span>
@@ -46,15 +44,15 @@
                     <div>
                         <span class="block text-sm text-gray-500 ">Description</span>
                         <p class="mt-1 text-gray-800 ">
-                            {{ $project->description ?: 'No description provided.' }}</p>
+                            {{ $project->description ?: 'No description provided.' }}
+                        </p>
                     </div>
                 </div>
             </div>
 
             <!-- Invoices? Tasks? -->
             <div class="bg-white  overflow-hidden shadow-sm rounded-lg">
-                <div
-                    class="p-6 border-b border-gray-100  font-bold text-lg text-gray-800 ">
+                <div class="p-6 border-b border-gray-100  font-bold text-lg text-gray-800 ">
                     Related Invoices
                 </div>
                 <div class="p-6">
@@ -66,14 +64,16 @@
                                         <div class="text-sm font-bold text-gray-800 ">Inv #{{ $invoice->id }}
                                         </div>
                                         <div class="text-xs text-gray-500">
-                                            {{ $invoice->due_date ? $invoice->due_date->format('Y-m-d') : '' }}</div>
+                                            {{ $invoice->due_date ? $invoice->due_date->format('Y-m-d') : '' }}
+                                        </div>
                                     </div>
                                     <div class="text-right">
                                         <div class="text-sm font-bold text-gray-800 ">
-                                            ${{ number_format($invoice->amount, 2) }}</div>
+                                            Rp {{ number_format($invoice->amount, 0, ',', '.') }}</div>
                                         <div
                                             class="text-xs {{ $invoice->status == 'Paid' ? 'text-green-500' : 'text-red-500' }}">
-                                            {{ $invoice->status }}</div>
+                                            {{ $invoice->status }}
+                                        </div>
                                     </div>
                                 </li>
                             @endforeach

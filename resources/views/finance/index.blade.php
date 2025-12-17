@@ -11,7 +11,7 @@
                 class="bg-white  overflow-hidden shadow-sm rounded-lg p-6 flex flex-col items-center justify-center">
                 <div class="text-sm font-medium text-gray-500  uppercase tracking-widest">Total
                     Revenue</div>
-                <div class="text-3xl font-bold text-green-600 mt-2">${{ number_format($totalRevenue, 2) }}</div>
+                <div class="text-3xl font-bold text-green-600 mt-2">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</div>
             </div>
 
             <!-- Total Expenses -->
@@ -19,7 +19,7 @@
                 class="bg-white  overflow-hidden shadow-sm rounded-lg p-6 flex flex-col items-center justify-center">
                 <div class="text-sm font-medium text-gray-500  uppercase tracking-widest">Total
                     Expenses</div>
-                <div class="text-3xl font-bold text-red-600 mt-2">${{ number_format($totalExpenses, 2) }}</div>
+                <div class="text-3xl font-bold text-red-600 mt-2">Rp {{ number_format($totalExpenses, 0, ',', '.') }}</div>
             </div>
 
             <!-- Net Profit -->
@@ -28,7 +28,7 @@
                 <div class="text-sm font-medium text-gray-500  uppercase tracking-widest">Net Profit
                 </div>
                 <div class="text-3xl font-bold {{ $profit >= 0 ? 'text-blue-600' : 'text-red-600' }} mt-2">
-                    ${{ number_format($profit, 2) }}</div>
+                    Rp {{ number_format($profit, 0, ',', '.') }}</div>
             </div>
         </div>
 
@@ -72,7 +72,7 @@
                                             {{ $expense->description }}</td>
                                         <td
                                             class="px-5 py-2 border-b border-gray-100  text-sm text-red-600 font-medium">
-                                            ${{ number_format($expense->amount, 2) }}</td>
+                                            Rp {{ number_format($expense->amount, 0, ',', '.') }}</td>
                                         <td class="px-5 py-2 border-b border-gray-100  text-sm text-right">
                                             <button onclick="deleteExpense({{ $expense->id }})"
                                                 class="text-red-400 hover:text-red-600"><i class="fas fa-trash"></i></button>
@@ -120,7 +120,7 @@
                                             {{ $invoice->project->name }}</td>
                                         <td
                                             class="px-5 py-2 border-b border-gray-100  text-sm text-green-600 font-medium">
-                                            ${{ number_format($invoice->amount, 2) }}</td>
+                                            Rp {{ number_format($invoice->amount, 0, ',', '.') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -160,7 +160,7 @@
                                     <div>
                                         <label for="amount"
                                             class="block text-sm font-medium text-gray-700 ">Amount
-                                            ($)</label>
+                                            (Rp)</label>
                                         <input type="number" step="0.01" name="amount" id="amount"
                                             class="mt-1 block w-full rounded-md border-gray-300   shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                                             required>
@@ -214,7 +214,8 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
                     },
                     body: JSON.stringify(data)
                 });
@@ -245,7 +246,8 @@
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
                         .then(response => response.json())

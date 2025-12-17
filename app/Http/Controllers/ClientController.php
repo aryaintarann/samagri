@@ -21,7 +21,7 @@ class ClientController extends Controller
      */
     public function create()
     {
-        return view('clients.create'); // Or returning partial for modal? usually simply not used if modal is in index
+        return redirect()->route('clients.index');
     }
 
     /**

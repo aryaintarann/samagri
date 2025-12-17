@@ -126,11 +126,11 @@
             </tr>
             <tr class="item">
                 <td>Project Service: {{ $invoice->project->name }}</td>
-                <td>${{ number_format($invoice->amount, 2) }}</td>
+                <td>Rp {{ number_format($invoice->amount, 0, ',', '.') }}</td>
             </tr>
             <tr class="total">
                 <td></td>
-                <td>Total: ${{ number_format($invoice->amount, 2) }}</td>
+                <td>Total: Rp {{ number_format($invoice->amount, 0, ',', '.') }}</td>
             </tr>
             <tr>
                 <td></td>

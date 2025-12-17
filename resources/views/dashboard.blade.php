@@ -38,7 +38,7 @@
                     <div>
                         <div class="text-sm font-medium text-gray-500">Total Revenue</div>
                         <div class="text-2xl font-bold text-gray-800">
-                            ${{ number_format($totalRevenue, 2) }}</div>
+                            Rp {{ number_format($totalRevenue, 0, ',', '.') }}</div>
                     </div>
                 </div>
 

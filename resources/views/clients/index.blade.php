@@ -37,27 +37,25 @@
                     <tbody>
                         @foreach($clients as $client)
                             <tr class="hover:bg-gray-50 :bg-gray-700 transition">
-                                <td
-                                    class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
+                                <td class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
                                     <p class="text-gray-900  whitespace-no-wrap font-semibold">
-                                        {{ $client->name }}</p>
+                                        {{ $client->name }}
+                                    </p>
                                 </td>
-                                <td
-                                    class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
+                                <td class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
                                     <p class="text-gray-900  whitespace-no-wrap">
-                                        {{ $client->company ?? '-' }}</p>
+                                        {{ $client->company ?? '-' }}
+                                    </p>
                                 </td>
-                                <td
-                                    class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
+                                <td class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
                                     <p class="text-gray-900  whitespace-no-wrap">{{ $client->email }}</p>
                                 </td>
-                                <td
-                                    class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
+                                <td class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
                                     <p class="text-gray-900  whitespace-no-wrap">
-                                        {{ $client->phone ?? '-' }}</p>
+                                        {{ $client->phone ?? '-' }}
+                                    </p>
                                 </td>
-                                <td
-                                    class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
+                                <td class="px-5 py-5 border-b border-gray-200  bg-white  text-sm">
                                     <button onclick="viewClient({{ $client->id }})"
                                         class="text-blue-500 hover:text-blue-700 mr-3 transition"><i
                                             class="fas fa-eye"></i></button>
@@ -96,12 +94,10 @@
                     <div class="bg-white  px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div class="sm:flex sm:items-start">
                             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                <h3 class="text-lg leading-6 font-medium text-gray-900 "
-                                    id="modalTitle">Add Client</h3>
+                                <h3 class="text-lg leading-6 font-medium text-gray-900 " id="modalTitle">Add Client</h3>
                                 <div class="mt-4 space-y-4">
                                     <div>
-                                        <label for="name"
-                                            class="block text-sm font-medium text-gray-700 ">Name</label>
+                                        <label for="name" class="block text-sm font-medium text-gray-700 ">Name</label>
                                         <input type="text" name="name" id="name"
                                             class="mt-1 block w-full rounded-md border-gray-300   shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                                             required>
@@ -188,7 +184,8 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
                     },
                     body: JSON.stringify(data)
                 });
@@ -209,7 +206,10 @@
         async function editClient(id) {
             try {
                 const response = await fetch(`/clients/${id}`, {
-                    headers: { 'Accept': 'application/json' }
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
                 });
                 const data = await response.json();
                 openModal('edit', data);
@@ -233,7 +233,8 @@
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
                         .then(response => response.json())

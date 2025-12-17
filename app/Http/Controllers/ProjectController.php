@@ -21,6 +21,17 @@ class ProjectController extends Controller
     }
 
     /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        // Projects are created via Modal on the Index page
+        // Redirecting to index to trigger the modal viewing logic if we wanted, 
+        // or simply show the index page where the 'Add Project' button is visible.
+        return redirect()->route('projects.index');
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
