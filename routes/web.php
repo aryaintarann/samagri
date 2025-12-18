@@ -11,6 +11,7 @@ use App\Http\Controllers\GlobalSearchController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AttachmentController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -30,6 +31,7 @@ Route::get('/finance', [FinanceController::class, 'index'])->middleware(['auth',
 Route::get('/global-search', [GlobalSearchController::class, 'index'])->middleware(['auth', 'verified'])->name('global.search');
 Route::post('/finance/expenses', [FinanceController::class, 'storeExpense'])->middleware(['auth', 'verified'])->name('finance.expenses.store');
 Route::delete('/finance/expenses/{expense}', [FinanceController::class, 'destroyExpense'])->middleware(['auth', 'verified'])->name('finance.expenses.destroy');
+Route::resource('users', UserController::class)->middleware(['auth', 'verified']);
 
 
 Route::middleware('auth')->group(function () {

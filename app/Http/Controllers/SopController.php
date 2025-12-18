@@ -31,7 +31,7 @@ class SopController extends Controller
     public function store(Request $request)
     {
         // Only CEO can create
-        if (auth()->user()->role !== 'CEO') {
+        if (!auth()->user()->hasRole('CEO')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -88,7 +88,7 @@ class SopController extends Controller
     public function edit(Sop $sop)
     {
         // Only CEO
-        if (auth()->user()->role !== 'CEO') {
+        if (!auth()->user()->hasRole('CEO')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -103,7 +103,7 @@ class SopController extends Controller
      */
     public function update(Request $request, Sop $sop)
     {
-        if (auth()->user()->role !== 'CEO') {
+        if (!auth()->user()->hasRole('CEO')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

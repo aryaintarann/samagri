@@ -28,7 +28,7 @@
             <span class="font-medium">Invoices</span>
         </a>
 
-        @if(auth()->user()->role === 'CEO')
+        @if(auth()->user()->hasRole('CEO'))
             <a href="{{ route('finance.index') }}"
                 class="flex items-center px-6 py-3.5 transition-all duration-200 group {{ request()->routeIs('finance.*') ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600 hover:pl-7' }}">
                 <i
@@ -50,6 +50,15 @@
                 class="fas fa-users w-6 text-center mr-3 {{ request()->routeIs('clients.*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-500' }}"></i>
             <span class="font-medium">Clients</span>
         </a>
+
+        @if(auth()->user()->hasRole('CEO'))
+            <a href="{{ route('users.index') }}"
+                class="flex items-center px-6 py-3.5 transition-all duration-200 group {{ request()->routeIs('users.*') ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600 hover:pl-7' }}">
+                <i
+                    class="fas fa-user-shield w-6 text-center mr-3 {{ request()->routeIs('users.*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-500' }}"></i>
+                <span class="font-medium">User Management</span>
+            </a>
+        @endif
     </nav>
 
     <div class="p-4 border-t border-gray-100 bg-gray-50/50">

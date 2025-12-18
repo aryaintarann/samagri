@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
                 'name' => $role,
                 'email' => $email,
                 'password' => Hash::make('password'),
-                'role' => $role,
+                'role' => [$role],
             ]);
         }
     }

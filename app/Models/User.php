@@ -43,6 +43,23 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'role' => 'array',
         ];
+    }
+
+    /**
+     * Check if the user has a specific role.
+     */
+    public function hasRole(string $role): bool
+    {
+        return in_array($role, $this->role ?? []);
+    }
+
+    /**
+     * Check if the user has any of the given roles.
+     */
+    public function hasAnyRole(array $roles): bool
+    {
+        return !empty(array_intersect($roles, $this->role ?? []));
     }
 }
