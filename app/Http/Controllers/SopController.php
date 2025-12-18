@@ -147,7 +147,7 @@ class SopController extends Controller
      */
     public function destroy(Sop $sop)
     {
-        if (auth()->user()->role !== 'CEO') {
+        if (!auth()->user()->hasRole('CEO')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

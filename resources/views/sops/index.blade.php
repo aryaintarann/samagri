@@ -27,7 +27,7 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         <!-- New SOP Button (CEO Only) -->
-        @if(auth()->user()->role === 'CEO')
+        @if(auth()->user()->hasRole('CEO'))
             <div class="flex justify-end mb-8">
                 <button onclick="openModal('create')"
                     class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition transform hover:scale-105">
@@ -79,7 +79,7 @@
 
                         <div class="flex items-center space-x-2">
                             <!-- Action Buttons -->
-                            @if(auth()->user()->role === 'CEO')
+                            @if(auth()->user()->hasRole('CEO'))
                                 <button onclick="editSop({{ $sop->id }})"
                                     class="p-2 rounded-full text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition"
                                     title="Edit">

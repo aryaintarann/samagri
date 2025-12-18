@@ -24,7 +24,7 @@
                 </div>
             </div>
 
-            @if(auth()->user()->role === 'CEO')
+            @if(auth()->user()->hasRole('CEO'))
                 <!-- Total Revenue (CEO Only) -->
                 <div class="bg-white overflow-hidden shadow-sm rounded-lg p-6 flex items-center border border-gray-100">
                     <div class="p-3 rounded-full bg-yellow-50 text-yellow-600 mr-4">

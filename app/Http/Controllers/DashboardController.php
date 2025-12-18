@@ -12,7 +12,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $role = auth()->user()->role;
+
 
         $data = [
             'activeProjectsCount' => Project::where('active', true)->count(),
@@ -21,7 +21,7 @@ class DashboardController extends Controller
             'activeProjects' => Project::where('active', true)->with('client')->take(5)->get(), // Mini list
         ];
 
-        if ($role === 'CEO') {
+        if (auth()->user()->hasRole('CEO')) {
             $data['totalRevenue'] = Invoice::where('status', 'Paid')->sum('amount');
             $data['pendingInvoicesCount'] = Invoice::where('status', 'Pending')->count();
         }

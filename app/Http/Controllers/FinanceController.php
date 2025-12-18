@@ -12,7 +12,7 @@ class FinanceController extends Controller
     public function index()
     {
         // CEO Only Middleware checks this, but redundant check ok
-        if (auth()->user()->role !== 'CEO') {
+        if (!auth()->user()->hasRole('CEO')) {
             abort(403);
         }
 
@@ -29,7 +29,7 @@ class FinanceController extends Controller
 
     public function storeExpense(Request $request)
     {
-        if (auth()->user()->role !== 'CEO') {
+        if (!auth()->user()->hasRole('CEO')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -50,7 +50,7 @@ class FinanceController extends Controller
 
     public function destroyExpense(Expense $expense)
     {
-        if (auth()->user()->role !== 'CEO') {
+        if (!auth()->user()->hasRole('CEO')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

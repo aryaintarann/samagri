@@ -24,8 +24,21 @@ class ProjectController extends Controller
         // Pass clients for the Create Modal
         $clients = Client::all();
         // Fetch users grouped by role for assignment
-        $usersByRole = User::all()->groupBy('role');
-        $roles = User::select('role')->distinct()->pluck('role');
+        // Fetch all users
+        $allUsers = User::all();
+
+        // Define all available roles (or fetch from users if dynamic, but static list is safer/cleaner)
+        // Ideally should match the Seeder/System roles
+        $systemRoles = ['CEO', 'Project Manager', 'Sistem Analis', 'Programmer', 'DevOps', 'UI/UX', 'Marketing', 'QA'];
+
+        $usersByRole = [];
+        foreach ($systemRoles as $role) {
+            $usersByRole[$role] = $allUsers->filter(function ($user) use ($role) {
+                return $user->hasRole($role);
+            });
+        }
+
+        $roles = $systemRoles;
         return view('projects.index', compact('projects', 'clients', 'usersByRole', 'roles'));
     }
 

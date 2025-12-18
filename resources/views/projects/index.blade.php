@@ -48,7 +48,7 @@
                             </span>
                             <span
                                 class="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wider
-                                                                                                                                {{ $project->status === 'Completed' ? 'bg-green-100 text-green-800' : ($project->status === 'In Progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800') }}">
+                                                                                                                                    {{ $project->status === 'Completed' ? 'bg-green-100 text-green-800' : ($project->status === 'In Progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800') }}">
                                 {{ $project->status }}
                             </span>
                         </div>
@@ -76,7 +76,7 @@
                         <div class="mt-4 flex items-center -space-x-2 overflow-hidden">
                             @forelse($project->users->take(4) as $user)
                                 <div class="h-8 w-8 rounded-full ring-2 ring-white bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600 cursor-help"
-                                    title="{{ $user->name }} ({{ $user->role }})">
+                                    title="{{ $user->name }} ({{ implode(', ', $user->role) }})">
                                     {{ substr($user->name, 0, 2) }}
                                 </div>
                             @empty

@@ -27,7 +27,7 @@
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         <!-- Add Button (Role Check) -->
-        @if(in_array(auth()->user()->role, ['CEO', 'Marketing']))
+        @if(auth()->user()->hasAnyRole(['CEO', 'Marketing']))
             <div class="flex justify-end mb-8">
                 <button onclick="openModal('create')"
                     class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition transform hover:scale-105">
@@ -74,7 +74,7 @@
                         <button onclick="viewClient({{ $client->id }})" class="p-2 rounded-full text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition" title="View Details">
                             <i class="fas fa-eye text-sm"></i>
                         </button>
-                        @if(in_array(auth()->user()->role, ['CEO', 'Marketing']))
+                        @if(auth()->user()->hasAnyRole(['CEO', 'Marketing']))
                             <button onclick="editClient({{ $client->id }})" class="p-2 rounded-full text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 transition" title="Edit">
                                 <i class="fas fa-pencil-alt text-sm"></i>
                             </button>

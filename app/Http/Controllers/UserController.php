@@ -108,7 +108,7 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        if (auth()->user()->role !== 'CEO') {
+        if (!auth()->user()->hasRole('CEO')) {
             abort(403, 'Unauthorized action.');
         }
 
