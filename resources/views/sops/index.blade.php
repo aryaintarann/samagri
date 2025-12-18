@@ -39,25 +39,21 @@
         <!-- Knowledge Cards Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="cardsGrid">
             @foreach($sops as $sop)
-                <!-- Card -->
                 <div
-                    class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100 flex flex-col h-full sop-card group relative">
-                    <div class="p-8 flex-1">
-                        <!-- Header -->
-                        <div class="flex justify-between items-start mb-4">
+                    class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden group sop-card relative flex flex-col justify-between">
+                    <div class="p-8">
+                        <div class="flex items-center justify-between mb-4">
                             <span
-                                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 uppercase tracking-wide category-pill">
-                                {{ $sop->category }}
+                                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 category-pill">
+                                {{ $sop->category ?? 'General' }}
                             </span>
                             @if($sop->is_required)
-                                <span
-                                    class="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold bg-red-50 text-red-500 border border-red-100 uppercase tracking-wider">
-                                    Required
+                                <span class="inline-flex items-center text-red-500 text-xs font-medium"
+                                    title="Required Reading">
+                                    <i class="fas fa-exclamation-circle mr-1"></i> Mandatory
                                 </span>
                             @endif
                         </div>
-
-                        <!-- Title -->
                         <h3
                             class="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors sop-title">
                             {{ $sop->title }}
@@ -166,6 +162,13 @@
                                     required placeholder="Write your article content here..."></textarea>
                             </div>
 
+                            <div>
+                                <label for="attachments"
+                                    class="block text-sm font-medium text-gray-700 mb-2">Attachments</label>
+                                <input type="file" name="attachments[]" id="attachments" multiple
+                                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                            </div>
+
                             <div class="flex items-center">
                                 <input id="is_required" name="is_required" type="checkbox"
                                     class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
@@ -221,11 +224,55 @@
                     </div>
                 </div>
 
+                <!-- Attachments Section (JS populated) -->
+                <div class="px-8 pb-8" id="viewSopAttachmentsContainer" style="display: none;">
+                    <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Attachments</h4>
+                    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="viewSopAttachmentsList">
+                        <!-- Items injected here -->
+                    </ul>
+                </div>
+
                 <!-- Modal Footer -->
                 <div class="bg-gray-50 px-8 py-4 flex justify-end">
                     <button type="button"
                         class="inline-flex justify-center rounded-xl border border-gray-300 shadow-sm px-6 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
                         onclick="closeViewModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" aria-hidden="true"
+                onclick="closePreview()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+                class="inline-block align-middle bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-4xl sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4" id="previewTitle">
+                                Attachment Preview
+                            </h3>
+                            <div id="previewContent"
+                                class="flex justify-center items-center min-h-[400px] bg-gray-100 rounded-lg overflow-hidden">
+                                <!-- Content injected via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                        onclick="closePreview()">
+                        Close
+                    </button>
+                    <a id="downloadLink" href="#"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Download
+                    </a>
                 </div>
             </div>
         </div>
@@ -289,28 +336,31 @@
             const id = formData.get('id');
             const url = id ? `/sops/${id}` : '/sops';
 
-            // Checkbox handling (FormData doesn't include unchecked)
-            // But we can append is_required if checked? Wait, controller uses has('is_required').
-            // FormData sends 'on' if checked, fails to send if unchecked. 
-            // My controller logic: $validated['is_required'] = $request->has('is_required');
-            // This works with standard POST. With JSON verify.
+            // For updates (PUT), Laravel needs standard POST with _method field for file uploads
+            if (id) {
+                formData.append('_method', 'PUT');
+            }
 
-            const data = Object.fromEntries(formData.entries());
-            data.is_required = document.getElementById('is_required').checked;
+            // Handle checkbox (send 1 or 0)
+            const isRequired = document.getElementById('is_required').checked ? '1' : '0';
+            formData.set('is_required', isRequired);
 
             try {
                 const response = await fetch(url, {
-                    method: id ? 'PUT' : 'POST',
+                    method: 'POST', // Always POST for file uploads
                     headers: {
-                        'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                    body: JSON.stringify(data)
+                    body: formData
                 });
 
-                if (!response.ok) throw new Error('Network response was not ok');
+                if (!response.ok) {
+                    const error = await response.json();
+                    if (response.status === 403) throw new Error('Unauthorized');
+                    throw new Error(error.message || 'Network response was not ok');
+                }
                 const result = await response.json();
 
                 closeModal();
@@ -325,7 +375,7 @@
                 });
             } catch (error) {
                 console.error('Error:', error);
-                Swal.fire('Error', 'Unauthorized or Error Occurred', 'error');
+                Swal.fire('Error', error.message || 'Unauthorized or Error Occurred', 'error');
             }
         }
 
@@ -364,6 +414,49 @@
                 document.getElementById('viewSopContent').innerText = data.content;
                 document.getElementById('viewSopMeta').innerText = 'Last updated ' + new Date(data.updated_at).toLocaleDateString();
 
+                // Attachments
+                const attachmentsContainer = document.getElementById('viewSopAttachmentsContainer');
+                const attachmentsList = document.getElementById('viewSopAttachmentsList');
+                attachmentsList.innerHTML = ''; // Clear prev
+
+                if (data.attachments && data.attachments.length > 0) {
+                    attachmentsContainer.style.display = 'block';
+                    data.attachments.forEach(file => {
+                        const li = document.createElement('li');
+                        li.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100 hover:border-blue-200 transition-colors';
+
+                        let iconClass = 'fa-file-alt text-gray-400';
+                        if (file.file_type && file.file_type.includes('image')) iconClass = 'fa-image text-blue-500';
+                        else if (file.file_type && file.file_type.includes('pdf')) iconClass = 'fa-file-pdf text-red-500';
+
+                        const filePath = `/attachments/${file.id}`;
+                        li.innerHTML = `
+                            <div class="flex items-center space-x-3 overflow-hidden">
+                                <i class="fas ${iconClass} text-lg"></i>
+                                <div class="min-w-0">
+                                    <button type="button" onclick="openPreview('${filePath}', '${file.file_name}', '${file.file_type}')"
+                                        class="text-sm font-medium text-gray-700 truncate hover:text-blue-600 text-left focus:outline-none" title="${file.file_name}">
+                                        ${file.file_name}
+                                    </button>
+                                    <p class="text-xs text-gray-500">${(file.file_size / 1024).toFixed(1)} KB</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <button type="button" onclick="openPreview('${filePath}', '${file.file_name}', '${file.file_type}')"
+                                    class="text-gray-400 hover:text-blue-600 p-2" title="Preview">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <a href="${filePath}?download=1" class="text-gray-400 hover:text-green-600 p-2" title="Download">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </div>
+                        `;
+                        attachmentsList.appendChild(li);
+                    });
+                } else {
+                    attachmentsContainer.style.display = 'none';
+                }
+
                 document.getElementById('viewSopModal').classList.remove('hidden');
             } catch (error) {
                 console.error(error);
@@ -382,7 +475,7 @@
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch(`/sops/${id}`, {
+                    fetch(`/ sops / ${id} `, {
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -400,6 +493,39 @@
                         .catch(error => Swal.fire('Error', 'Could not delete SOP (Unauthorized?)', 'error'));
                 }
             })
+        }
+
+        // Preview Modal Logic
+        function openPreview(url, name, type) {
+            const modal = document.getElementById('previewModal');
+            const content = document.getElementById('previewContent');
+            const title = document.getElementById('previewTitle');
+            const downloadBtn = document.getElementById('downloadLink');
+
+            title.innerText = name;
+            downloadBtn.href = url + '?download=1';
+            content.innerHTML = ''; // Clear previous
+
+            if (type.includes('image')) {
+                content.innerHTML = `<img src="${url}" class="max-w-full max-h-[70vh] object-contain" alt="${name}">`;
+            } else if (type.includes('pdf')) {
+                content.innerHTML = `<iframe src="${url}" class="w-full h-[70vh]" frameborder="0"></iframe>`;
+            } else {
+                content.innerHTML = `
+                    <div class="text-center p-10">
+                        <i class="fas fa-file-alt text-6xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-500">Preview not available for this file type.</p>
+                        <p class="text-sm text-gray-400 mt-2">(${type})</p>
+                    </div>
+                 `;
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closePreview() {
+            document.getElementById('previewModal').classList.add('hidden');
+            document.getElementById('previewContent').innerHTML = '';
         }
     </script>
 </x-app-layout>

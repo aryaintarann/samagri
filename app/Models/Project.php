@@ -25,6 +25,11 @@ class Project extends Model
         return $this->belongsToMany(User::class)->withTimestamps();
     }
 
+    public function attachments()
+    {
+        return $this->morphMany(Attachment::class, 'attachable');
+    }
+
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);

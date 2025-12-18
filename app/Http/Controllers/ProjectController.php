@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Notifications\ProjectAssigned;
 use Illuminate\Support\Facades\Notification;
 use App\Traits\LogsActivity;
+use App\Models\Attachment;
 
 class ProjectController extends Controller
 {
@@ -63,6 +64,22 @@ class ProjectController extends Controller
         $project = Project::create($validated);
 
         $this->logActivity('Created Project', 'Created project: ' . $project->name);
+
+        // Handle Attachments
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                if ($file->isValid()) {
+                    $path = $file->store('attachments', 'public');
+
+                    $project->attachments()->create([
+                        'file_path' => $path,
+                        'file_name' => $file->getClientOriginalName(),
+                        'file_type' => $file->getClientMimeType(),
+                        'file_size' => $file->getSize(),
+                    ]);
+                }
+            }
+        }
 
         // Sync Assignees (Team)
         if ($request->has('assignees')) {
@@ -123,6 +140,22 @@ class ProjectController extends Controller
             $validated['active'] = true;
 
         $project->update($validated);
+
+        // Handle Attachments
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                if ($file->isValid()) {
+                    $path = $file->store('attachments', 'public');
+
+                    $project->attachments()->create([
+                        'file_path' => $path,
+                        'file_name' => $file->getClientOriginalName(),
+                        'file_type' => $file->getClientMimeType(),
+                        'file_size' => $file->getSize(),
+                    ]);
+                }
+            }
+        }
 
         // Sync Assignees (Team)
         if ($request->has('assignees')) {

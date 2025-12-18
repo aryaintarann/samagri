@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Sop;
 use Illuminate\Http\Request;
+use App\Models\Attachment;
 
 class SopController extends Controller
 {
@@ -42,10 +43,26 @@ class SopController extends Controller
         ]);
 
         $validated['category'] = $validated['category'] ?? 'General';
-        $validated['is_required'] = $request->has('is_required'); // Checkbox handling
+        $validated['is_required'] = $request->boolean('is_required'); // Checkbox handling
         $validated['created_by'] = auth()->id();
 
         $sop = Sop::create($validated);
+
+        // Handle Attachments
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                if ($file->isValid()) {
+                    $path = $file->store('attachments', 'public');
+
+                    $sop->attachments()->create([
+                        'file_path' => $path,
+                        'file_name' => $file->getClientOriginalName(),
+                        'file_type' => $file->getClientMimeType(),
+                        'file_size' => $file->getSize(),
+                    ]);
+                }
+            }
+        }
 
         if ($request->ajax()) {
             return response()->json(['message' => 'SOP created successfully', 'sop' => $sop]);
@@ -60,7 +77,7 @@ class SopController extends Controller
     public function show(Sop $sop)
     {
         if (request()->ajax()) {
-            return response()->json($sop);
+            return response()->json($sop->load('attachments'));
         }
         return redirect()->route('sops.index');
     }
@@ -98,9 +115,25 @@ class SopController extends Controller
         ]);
 
         $validated['category'] = $validated['category'] ?? 'General';
-        $validated['is_required'] = $request->has('is_required');
+        $validated['is_required'] = $request->boolean('is_required');
 
         $sop->update($validated);
+
+        // Handle Attachments
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                if ($file->isValid()) {
+                    $path = $file->store('attachments', 'public');
+
+                    $sop->attachments()->create([
+                        'file_path' => $path,
+                        'file_name' => $file->getClientOriginalName(),
+                        'file_type' => $file->getClientMimeType(),
+                        'file_size' => $file->getSize(),
+                    ]);
+                }
+            }
+        }
 
         if ($request->ajax()) {
             return response()->json(['message' => 'SOP updated successfully', 'sop' => $sop]);

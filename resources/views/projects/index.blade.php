@@ -48,7 +48,7 @@
                             </span>
                             <span
                                 class="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wider
-                                                                                                                        {{ $project->status === 'Completed' ? 'bg-green-100 text-green-800' : ($project->status === 'In Progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800') }}">
+                                                                                                                                {{ $project->status === 'Completed' ? 'bg-green-100 text-green-800' : ($project->status === 'In Progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800') }}">
                                 {{ $project->status }}
                             </span>
                         </div>
@@ -192,11 +192,12 @@
                                     <label for="status"
                                         class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                                     <select name="status" id="status"
-                                        class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-3">
-                                        <option value="Pending">Pending</option>
+                                        class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-3"
+                                        required>
+                                        <option value="Not Started">Not Started</option>
                                         <option value="In Progress">In Progress</option>
                                         <option value="Completed">Completed</option>
-                                        <option value="Cancelled">Cancelled</option>
+                                        <option value="On Hold">On Hold</option>
                                     </select>
                                 </div>
                             </div>
@@ -205,8 +206,9 @@
                                 <div>
                                     <label for="budget" class="block text-sm font-medium text-gray-700 mb-2">Budget
                                         (Rp)</label>
-                                    <input type="number" step="0.01" name="budget" id="budget"
-                                        class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-3">
+                                    <input type="number" name="budget" id="budget"
+                                        class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-3"
+                                        required>
                                 </div>
                                 <div>
                                     <label for="deadline"
@@ -223,13 +225,13 @@
                                     class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"></textarea>
                             </div>
 
-                            <div class="flex items-center">
-                                <input id="active" name="active" type="checkbox" value="1"
-                                    class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                <label for="active" class="ml-3 block text-sm font-medium text-gray-700">
-                                    Active (Show on Dashboard)
-                                </label>
+                            <div>
+                                <label for="attachments"
+                                    class="block text-sm font-medium text-gray-700 mb-2">Attachments</label>
+                                <input type="file" name="attachments[]" id="attachments" multiple
+                                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                             </div>
+
                         </div>
                     </div>
                     <div class="bg-gray-50 px-8 py-4 flex flex-row-reverse">
@@ -246,6 +248,9 @@
     </div>
 
     <script>
+        // Use event delegation for dynamic content if needed, though here buttons are static enough or reconstructed
+        // Actually, cards are static unless we reload via AJAX, but the filter is JS-based on DOM.
+
         function filterCards() {
             const input = document.getElementById('searchInput');
             const filter = input.value.toLowerCase();
@@ -255,7 +260,6 @@
             for (let i = 0; i < cards.length; i++) {
                 const title = cards[i].getElementsByClassName('project-title')[0];
                 const txtValue = title.textContent || title.innerText;
-
                 if (txtValue.toLowerCase().indexOf(filter) > -1) {
                     cards[i].style.display = "";
                 } else {
@@ -269,13 +273,15 @@
             const form = document.getElementById('projectForm');
             const title = document.getElementById('modalTitle');
 
+            // Reset form first
+            form.reset();
+
+            // Clear all role dropdowns
+            document.querySelectorAll('.role-dropdown').forEach(select => select.value = "");
+
             if (mode === 'create') {
                 title.innerText = 'Add Project';
-                form.reset();
                 document.getElementById('projectId').value = '';
-                // Reset all role dropdowns
-                document.querySelectorAll('.role-dropdown').forEach(dd => dd.value = '');
-                document.getElementById('active').checked = true;
             } else if (mode === 'edit' && data) {
                 title.innerText = 'Edit Project';
                 document.getElementById('projectId').value = data.id;
@@ -283,26 +289,27 @@
                 document.getElementById('client_id').value = data.client_id;
                 document.getElementById('status').value = data.status;
                 document.getElementById('budget').value = data.budget;
-                document.getElementById('deadline').value = data.deadline ? data.deadline.substring(0, 10) : '';
-                document.getElementById('description').value = data.description || '';
-                // document.getElementById('user_id').value = data.user_id || ''; // Removed
+                document.getElementById('deadline').value = data.deadline ? data.deadline.split('T')[0] : '';
+                document.getElementById('description').value = data.description;
 
-                // Populate role dropdowns
-                if (data.users && data.users.length > 0) {
+                // Populate roles
+                if (data.users && Array.isArray(data.users)) {
                     data.users.forEach(user => {
-                        // Find dropdown with data-role matching user's role
-                        // We need a robust way to match. The loop uses $role, user has role column.
-                        // Assuming user.role matches the $role strings exactly.
-                        const dropdowns = document.querySelectorAll('.role-dropdown');
-                        dropdowns.forEach(dd => {
-                            if (dd.getAttribute('data-role') === user.role) {
-                                dd.value = user.id;
-                            }
-                        });
+                        // Find a dropdown that matches this user's role
+                        // The user object has a pivot or role directly? 
+                        // The 'users' relation belongsToMany. User model has 'role' column.
+                        // Our dropdowns have IDs like assignee_role-slug
+                        // user.role is e.g. "Project Manager"
+                        // slug might be "project-manager"
+
+                        // BUT, Laravel Str::slug() handles it. We need to reproduce that logic or just check data-role attribute
+                        const roleDropdowns = document.querySelectorAll(`select[data-role="${user.role}"]`);
+                        if (roleDropdowns.length > 0) {
+                            // In this simple UI, we only have one dropdown per role.
+                            roleDropdowns[0].value = user.id;
+                        }
                     });
                 }
-
-                document.getElementById('active').checked = data.active == 1;
             }
         }
 
@@ -317,38 +324,26 @@
             const id = formData.get('id');
             const url = id ? `/projects/${id}` : '/projects';
 
-            const data = {};
-            formData.forEach((value, key) => {
-                // Check if key is an array (ends with [])
-                if (key.endsWith('[]')) {
-                    const cleanKey = key.slice(0, -2);
-                    if (!data[cleanKey]) {
-                        data[cleanKey] = [];
-                    }
-                    data[cleanKey].push(value);
-                } else {
-                    data[key] = value;
-                }
-            });
-
-            // Handle assignees specifically if using named indexes assignees[role] or strict arrays
-            // If the inputs are name="assignees[]", the above loop handles it into data['assignees'] array.
-
-            data.active = document.getElementById('active').checked;
+            if (id) {
+                formData.append('_method', 'PUT');
+            }
 
             try {
                 const response = await fetch(url, {
-                    method: id ? 'PUT' : 'POST',
+                    method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                    body: JSON.stringify(data)
+                    body: formData
                 });
 
-                if (!response.ok) throw new Error('Network response was not ok');
+                if (!response.ok) {
+                    const error = await response.json();
+                    if (response.status === 403) throw new Error('Unauthorized');
+                    throw new Error(error.message || 'Network response was not ok');
+                }
                 const result = await response.json();
 
                 closeModal();
@@ -363,15 +358,22 @@
                 });
             } catch (error) {
                 console.error('Error:', error);
-                Swal.fire('Error', 'Something went wrong', 'error');
+                Swal.fire('Error', error.message || 'Error executing action', 'error');
             }
         }
 
         async function editProject(id) {
             try {
                 const response = await fetch(`/projects/${id}/edit`, {
-                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
                 });
+                if (response.status === 403) {
+                    Swal.fire('Error', 'Unauthorized', 'error');
+                    return;
+                }
                 const data = await response.json();
                 openModal('edit', data);
             } catch (error) {
@@ -387,7 +389,7 @@
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
-                cancelButtonColor: '#d33', // Both red? Defaults ok
+                cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -399,7 +401,10 @@
                             'X-Requested-With': 'XMLHttpRequest'
                         }
                     })
-                        .then(response => response.json())
+                        .then(response => {
+                            if (response.status === 403) throw new Error('Unauthorized');
+                            return response.json();
+                        })
                         .then(data => {
                             Swal.fire('Deleted!', data.message, 'success').then(() => location.reload());
                         })
