@@ -31,7 +31,16 @@ class ProjectAssigned extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'mail'];
+    }
+
+    /**
+     * Get the mail representation of the notification.
+     */
+    public function toMail(object $notifiable)
+    {
+        return (new \App\Mail\ProjectAssignedMail($this->project))
+            ->to($notifiable->email);
     }
 
     /**
