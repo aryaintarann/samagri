@@ -47,6 +47,11 @@ class InvoiceController extends Controller
         $invoice = Invoice::create($validated);
         $this->logActivity('Created Invoice', 'Created invoice ' . $invoice->invoice_number . ' for project: ' . $invoice->project->name);
 
+        // Send Email Notification to Client
+        if ($invoice->project->client && $invoice->project->client->email) {
+            $invoice->project->client->notify(new \App\Notifications\InvoiceCreated($invoice));
+        }
+
         if ($request->ajax()) {
             return response()->json(['message' => 'Invoice created successfully', 'invoice' => $invoice]);
         }
@@ -92,6 +97,11 @@ class InvoiceController extends Controller
         $invoice->update($validated);
         $this->logActivity('Updated Invoice', 'Updated invoice ' . $invoice->invoice_number . ' status to: ' . $invoice->status);
 
+        // Send Email Notification if Paid
+        if ($validated['status'] === 'Paid' && $invoice->project->client && $invoice->project->client->email) {
+            $invoice->project->client->notify(new \App\Notifications\InvoicePaid($invoice));
+        }
+
         if ($request->ajax()) {
             return response()->json(['message' => 'Invoice updated successfully', 'invoice' => $invoice]);
         }
@@ -118,6 +128,6 @@ class InvoiceController extends Controller
     public function download(Invoice $invoice)
     {
         $pdf = Pdf::loadView('invoices.pdf', compact('invoice'));
-        return $pdf->download('invoice-' . $invoice->invoice_number . '.pdf');
+        return $pdf->stream('invoice-' . $invoice->invoice_number . '.pdf');
     }
 }
