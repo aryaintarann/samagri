@@ -64,6 +64,10 @@ class SopController extends Controller
             }
         }
 
+        // Notify All Users
+        $users = \App\Models\User::all();
+        \Illuminate\Support\Facades\Notification::send($users, new \App\Notifications\SopCreated($sop));
+
         if ($request->ajax()) {
             return response()->json(['message' => 'SOP created successfully', 'sop' => $sop]);
         }
