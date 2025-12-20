@@ -53,55 +53,72 @@
         <!-- Quick Actions & Active Projects -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Left Column: Active Projects List -->
-            <div class="lg:col-span-2 bg-white overflow-hidden shadow-sm rounded-lg border border-gray-100">
-                <div class="p-6 border-b border-gray-100 font-bold text-lg text-gray-800">
-                    Active Projects
+            <div class="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm">
+                <div class="px-6 py-4 border-b border-gray-50 flex justify-between items-center">
+                    <h3 class="font-bold text-lg text-gray-800 tracking-tight">Active Projects</h3>
+                    <a href="{{ route('projects.index') }}"
+                        class="text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline">View All</a>
                 </div>
-                <div class="p-6">
+                <div class="p-2">
                     @if($activeProjects->count() > 0)
-                        <table class="min-w-full leading-normal">
-                            <thead>
-                                <tr>
-                                    <th
-                                        class="px-5 py-3 border-b-2 border-gray-100 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Project
-                                    </th>
-                                    <th
-                                        class="px-5 py-3 border-b-2 border-gray-100 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Client
-                                    </th>
-                                    <th
-                                        class="px-5 py-3 border-b-2 border-gray-100 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                        Status
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($activeProjects as $project)
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
                                     <tr>
-                                        <td class="px-5 py-5 border-b border-gray-100 bg-white text-sm">
-                                            <p class="text-gray-900 whitespace-no-wrap font-medium">{{ $project->name }}</p>
-                                        </td>
-                                        <td class="px-5 py-5 border-b border-gray-100 bg-white text-sm">
-                                            <p class="text-gray-600 whitespace-no-wrap">{{ $project->client->name }}</p>
-                                        </td>
-                                        <td class="px-5 py-5 border-b border-gray-100 bg-white text-sm">
-                                            <span
-                                                class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
-                                                <span aria-hidden
-                                                    class="absolute inset-0 bg-green-100 opacity-50 rounded-full"></span>
-                                                <span class="relative text-green-700">Active</span>
-                                            </span>
-                                        </td>
+                                        <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                            Project</th>
+                                        <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                            Client</th>
+                                        <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                            Status</th>
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody class="divide-y divide-gray-50">
+                                    @foreach($activeProjects as $project)
+                                                            <tr class="hover:bg-gray-50/50 transition-colors group">
+                                                                <td class="px-6 py-4">
+                                                                    <div class="flex items-center">
+                                                                        <div
+                                                                            class="flex-shrink-0 w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs mr-3 border border-indigo-100">
+                                                                            {{ substr($project->name, 0, 2) }}
+                                                                        </div>
+                                                                        <div>
+                                                                            <a href="{{ route('projects.show', $project->id) }}"
+                                                                                class="text-gray-900 font-medium hover:text-blue-600 transition-colors block text-sm">
+                                                                                {{ $project->name }}
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="px-6 py-4 text-sm text-gray-500">
+                                                                    {{ $project->client->name }}
+                                                                </td>
+                                                                <td class="px-6 py-4 text-sm">
+                                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border
+                                                                                                                                                                    {{ $project->status === 'Completed' ? 'bg-green-50 text-green-700 border-green-100' :
+                                        ($project->status === 'In Progress' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                                            ($project->status === 'On Hold' ? 'bg-yellow-50 text-yellow-700 border-yellow-100' :
+                                                'bg-gray-50 text-gray-700 border-gray-100')) }}">
+                                                                        {{ $project->status }}
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     @else
-                        <p class="text-gray-500">No active projects.</p>
+                        <div class="flex flex-col items-center justify-center py-12 text-center">
+                            <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-3">
+                                <i class="fas fa-folder-open text-gray-400"></i>
+                            </div>
+                            <h3 class="text-gray-900 font-medium text-sm">No active projects</h3>
+                            <p class="text-gray-500 text-xs mt-1">Start a new project to see it here.</p>
+                        </div>
                     @endif
                 </div>
             </div>
+
 
             <!-- Right Column: Quick Actions & Activity Log -->
             <div class="space-y-6">
