@@ -1,7 +1,6 @@
 <aside class="w-64 bg-white text-gray-800 min-h-screen flex flex-col transition-all duration-300 shadow-xl z-10">
-    <div class="h-16 flex items-center justify-center font-bold text-xl bg-white mt-4">
-        <span class="text-blue-600 mr-2 text-2xl"><i class="fas fa-layer-group"></i></span>
-        <span class="tracking-wide text-gray-800">BizManager</span>
+    <div class="h-16 flex items-center justify-center bg-white mt-4">
+        <img src="/logo.png" alt="Samagri Logo" class="h-10 w-auto">
     </div>
 
     <!-- Profile removed as per request -->

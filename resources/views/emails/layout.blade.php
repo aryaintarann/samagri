@@ -225,7 +225,8 @@
 
                         <!-- Header / Logo -->
                         <div class="header-content">
-                            <a href="{{ url('/') }}" class="logo">Samagri</a>
+                            <img src="{{ $message->embed(public_path('logo.png')) }}" alt="Samagri"
+                                style="max-height: 50px; border: 0; outline: none;">
                         </div>
 
                         <!-- Main Content -->
