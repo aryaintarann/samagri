@@ -1,121 +1,34 @@
-<!DOCTYPE html>
-<html>
+@extends('emails.layout')
 
-<head>
-    <style>
-        body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: #f3f4f6;
-            padding: 20px;
-            color: #374151;
-        }
+@section('content')
+    <span class="sub-heading">Billing Update</span>
+    <h1>New Invoice Available</h1>
 
-        .container {
-            background-color: #ffffff;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
+    <p>Hello, a new invoice has been generated for your project. Please find the details below:</p>
 
-        .header {
-            border-bottom: 2px solid #f9fafb;
-            padding-bottom: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #4338ca;
-        }
-
-        .content {
-            line-height: 1.6;
-        }
-
-        .invoice-card {
-            background-color: #f9fafb;
-            padding: 20px;
-            border-radius: 6px;
-            margin: 20px 0;
-            border: 1px solid #e5e7eb;
-        }
-
-        .label {
-            font-weight: 600;
-            color: #6b7280;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .value {
-            color: #111827;
-            font-weight: 500;
-            font-size: 16px;
-            margin-bottom: 12px;
-        }
-
-        .amount {
-            color: #059669;
-            font-weight: bold;
-            font-size: 20px;
-        }
-
-        .button {
-            display: inline-block;
-            background-color: #4f46e5;
-            color: #ffffff;
-            padding: 12px 24px;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 600;
-            margin-top: 20px;
-        }
-
-        .footer {
-            margin-top: 30px;
-            text-align: center;
-            font-size: 12px;
-            color: #9ca3af;
-        }
-    </style>
-</head>
-
-<body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">Samagri</div>
-        </div>
-        <div class="content">
-            <h2>New Invoice Available</h2>
-            <p>Hello, a new invoice has been generated for your project. Please find the details below:</p>
-
-            <div class="invoice-card">
-                <div class="label">Invoice Number</div>
-                <div class="value">{{ $invoice->invoice_number }}</div>
-
-                <div class="label">Project</div>
-                <div class="value">{{ $invoice->project->name }}</div>
-
-                <div class="label">Amount Due</div>
-                <div class="value amount">Rp {{ number_format($invoice->amount, 0, ',', '.') }}</div>
-
-                <div class="label">Due Date</div>
-                <div class="value">{{ $invoice->due_date ? $invoice->due_date->format('M d, Y') : 'Immediate' }}</div>
-            </div>
-
-            <p style="text-align: center;">
-                <a href="{{ route('invoices.download', $invoice->id) }}" class="button">Download Invoice PDF</a>
-            </p>
-        </div>
-        <div class="footer">
-            &copy; {{ date('Y') }} Samagri. All rights reserved.
-        </div>
+    <div class="box">
+        <table class="info-table">
+            <tr>
+                <td class="label-col">Invoice #</td>
+                <td class="value-col">{{ $invoice->invoice_number }}</td>
+            </tr>
+            <tr>
+                <td class="label-col">Project</td>
+                <td class="value-col">{{ $invoice->project->name }}</td>
+            </tr>
+            <tr>
+                <td class="label-col">Due Date</td>
+                <td class="value-col">{{ $invoice->due_date ? $invoice->due_date->format('M d, Y') : 'Immediate' }}</td>
+            </tr>
+            <tr style="border-top: 1px dashed #e5e7eb;">
+                <td class="label-col" style="padding-top: 15px; color: #111827;">Amount Due</td>
+                <td class="value-col" style="padding-top: 15px; font-size: 18px; color: #1e3a8a;">Rp
+                    {{ number_format($invoice->amount, 0, ',', '.') }}</td>
+            </tr>
+        </table>
     </div>
-</body>
 
-</html>
+    <div class="btn-container">
+        <a href="{{ route('invoices.download', $invoice->id) }}" class="btn">Download Invoice PDF</a>
+    </div>
+@endsection
