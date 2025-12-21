@@ -13,7 +13,7 @@ cd $APP_DIR
 # 1. Pull latest code
 # Note: Ensure you have set up git credentials or ssh keys for this to work without password prompt
 echo "Pulling latest code..."
-git pull origin main
+git pull origin master
 
 # 2. Install PHP Dependencies
 echo "Installing Composer dependencies..."
