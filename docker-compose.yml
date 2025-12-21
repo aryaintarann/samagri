@@ -43,6 +43,7 @@ services:
       SERVICE_NAME: mysql
     volumes:
       - dbdata:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
     networks:
       - samagri
 
