@@ -42,6 +42,8 @@
                                     <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                         Email</th>
                                     <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                        Phone</th>
+                                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                                         Role</th>
                                     <th
                                         class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
@@ -68,6 +70,9 @@
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-500">
                                             {{ $user->email }}
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-500">
+                                            {{ $user->phone_number ?? '-' }}
                                         </td>
                                         <td class="px-6 py-4">
                                             @foreach($user->role as $role)

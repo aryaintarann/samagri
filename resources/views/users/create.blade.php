@@ -27,6 +27,16 @@
                         </div>
 
                         <div class="mb-4">
+                            <label for="phone_number" class="block text-sm font-medium text-gray-700">Phone</label>
+                            <input type="text" name="phone_number" id="phone_number" value="{{ old('phone_number') }}"
+                                placeholder="08..."
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            @error('phone_number')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="mb-4">
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Roles</label>
                                 <div class="grid grid-cols-2 gap-4">
