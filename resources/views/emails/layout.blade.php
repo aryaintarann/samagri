@@ -236,7 +236,7 @@
 
                         <!-- Footer -->
                         <div class="footer">
-                            <p class="copyright">&copy; {{ date('Y') }} Samagri Group. All rights reserved.</p>
+                            <p class="copyright">&copy; {{ date('Y') }} SamagriTech. All rights reserved.</p>
                             <div class="footer-links">
                                 <a href="#">Privacy Policy</a> • <a href="#">Support</a>
                             </div>
