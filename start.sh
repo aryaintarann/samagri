@@ -13,15 +13,20 @@ npm run build
 # Clear Cache
 php artisan optimize:clear
 
+# Ensure APP_KEY exists
+php artisan key:generate --force --skip-if-exists
+
 # Run Migrations with Retry
 echo "Running migrations..."
-for i in {1..10}; do
+count=0
+while [ $count -lt 10 ]; do
     php artisan migrate --force
     if [ $? -eq 0 ]; then
         echo "Migrations successful!"
         break
     fi
-    echo "Migration failed (DB not ready?), retrying in 5 seconds... ($i/10)"
+    count=$((count + 1))
+    echo "Migration failed (DB not ready?), retrying in 5 seconds... ($count/10)"
     sleep 5
 done
 
