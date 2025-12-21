@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Fix Git ownership issue
+git config --global --add safe.directory /var/www
+
 # Install PHP dependencies
 composer install --no-dev --optimize-autoloader
 
