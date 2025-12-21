@@ -41,6 +41,8 @@ chmod -R 775 $APP_DIR/storage $APP_DIR/bootstrap/cache
 
 # 7. Restart PHP-FPM
 echo "Reloading PHP-FPM..."
-service php8.2-fpm reload
+# Reload the default php-fpm service.
+# If this fails, check the exact service name with "systemctl list-units | grep php"
+service php*-fpm reload
 
 echo "Deployment complete! Application is now live."

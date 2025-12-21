@@ -10,15 +10,18 @@ echo "Updating system..."
 apt update && apt upgrade -y
 apt install -y software-properties-common curl zip unzip git acl
 
-# 2. Add PHP Repository (if on older Ubuntu, but 25 might have it, safe to add ppa:ondrej/php for latest)
-# Ubuntu 24.04+ generally has new PHP, but ondrej PPA is standard for flexibility
-add-apt-repository ppa:ondrej/php -y
-apt update
+# 2. Add PHP Repository
+# Note: Ubuntu 25.04 ("Plucky") is very new. The ondrej/php PPA might not support it yet.
+# However, Ubuntu 25.x defaults to PHP 8.3/8.4 which is compatible.
+# We skip the PPA for now and rely on default repos.
+# add-apt-repository ppa:ondrej/php -y
+# apt update
 
-# 3. Install PHP 8.2 and Extensions
-echo "Installing PHP 8.2..."
-apt install -y php8.2 php8.2-fpm php8.2-cli php8.2-mysql php8.2-sqlite3 php8.2-curl \
-    php8.2-gd php8.2-mbstring php8.2-xml php8.2-zip php8.2-bcmath php8.2-intl
+# 3. Install PHP (Default Version) and Extensions
+echo "Installing PHP..."
+# Using generic package names (php, php-fpm) ensures we get the version native to this Ubuntu release (likely 8.3 or 8.4)
+apt install -y php php-fpm php-cli php-mysql php-sqlite3 php-curl \
+    php-gd php-mbstring php-xml php-zip php-bcmath php-intl
 
 # 4. Install Nginx
 echo "Installing Nginx..."
