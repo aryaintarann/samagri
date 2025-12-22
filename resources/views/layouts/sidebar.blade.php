@@ -1,6 +1,11 @@
-<aside class="w-64 bg-white text-gray-800 min-h-screen flex flex-col transition-all duration-300 shadow-xl z-10">
-    <div class="h-16 flex items-center justify-center bg-white mt-4">
+<aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+    class="fixed inset-y-0 left-0 z-50 w-64 bg-white text-gray-800 transition-transform duration-300 ease-in-out transform md:translate-x-0 md:static md:inset-0 shadow-xl border-r border-gray-200">
+    <div class="flex justify-between items-center h-16 mt-4 px-6 md:justify-center">
         <img src="/logo.png" alt="Samagri Logo" class="h-10 w-auto">
+        <!-- Close button for mobile -->
+        <button @click="sidebarOpen = false" class="md:hidden text-gray-500 hover:text-gray-700">
+            <i class="fas fa-times text-xl"></i>
+        </button>
     </div>
 
     <!-- Profile removed as per request -->

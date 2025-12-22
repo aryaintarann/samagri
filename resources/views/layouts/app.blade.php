@@ -16,22 +16,36 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased text-gray-800 bg-gray-50">
-    <div class="flex min-h-screen">
+<body class="font-sans antialiased text-gray-800 bg-gray-50" x-data="{ sidebarOpen: false }">
+    <div class="flex min-h-screen relative">
+        <!-- Mobile Sidebar Backdrop -->
+        <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition:enter="transition-opacity ease-linear duration-300"
+            x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+            x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-40 md:hidden"
+            style="display: none;"></div>
+
         <!-- Sidebar -->
         @include('layouts.sidebar')
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col">
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
             <!-- Top Header -->
             <header
-                class="bg-white border-b border-gray-200 py-4 px-8 flex justify-between items-center sticky top-0 z-30 shadow-sm">
+                class="bg-white border-b border-gray-200 py-4 px-4 sm:px-8 flex justify-between items-center sticky top-0 z-30 shadow-sm">
                 <!-- Left: Title & Welcome -->
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800 capitalize">
-                        {{ auth()->user()->name }}
-                    </h2>
-                    <p class="text-sm text-gray-500 mt-0.5">SamagriTech</p>
+                <div class="flex items-center">
+                    <!-- Mobile Menu Button -->
+                    <button @click="sidebarOpen = true" class="mr-4 text-gray-500 focus:outline-none md:hidden">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-800 capitalize truncate max-w-[150px] sm:max-w-none">
+                            {{ auth()->user()->name }}
+                        </h2>
+                        <p class="text-sm text-gray-500 mt-0.5">SamagriTech</p>
+                    </div>
                 </div>
 
                 <!-- Right: Actions -->

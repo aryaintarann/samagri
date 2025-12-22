@@ -115,12 +115,12 @@
     <!-- SOP Modal (Create/Edit) -->
     <div id="sopModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
         aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"
                 onclick="closeModal()"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <!-- Ghost span removed -->
             <div
-                class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
+                class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all w-full mx-auto sm:my-8 sm:max-w-3xl">
                 <form id="sopForm" onsubmit="submitSop(event)">
                     @csrf
                     <input type="hidden" id="sopId" name="id">
@@ -194,54 +194,60 @@
     <!-- View SOP Modal -->
     <div id="viewSopModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
         aria-modal="true">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity backdrop-blur-sm" aria-hidden="true"
-                onclick="closeViewModal()"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" aria-hidden="true"
+            onclick="closeViewModal()"></div>
+
+        <!-- Modal Positioning Container -->
+        <div class="flex min-h-full items-center justify-center p-4">
+            <!-- Modal Card -->
             <div
-                class="inline-block align-middle bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:max-w-4xl sm:w-full">
+                class="relative w-full max-w-4xl transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all">
                 <!-- Modal Header -->
-                <div
-                    class="bg-gradient-to-r from-blue-50 to-indigo-50 px-8 py-6 border-b border-blue-100 flex justify-between items-start">
-                    <div>
-                        <span id="viewSopCategory"
-                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mb-2">
-                            Category
-                        </span>
-                        <h3 class="text-3xl font-bold text-gray-900" id="viewSopTitle">Article Title</h3>
-                        <p class="text-sm text-gray-500 mt-1" id="viewSopMeta">Last updated...</p>
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-5 sm:px-6 border-b border-blue-100">
+                    <div class="flex items-start justify-between">
+                        <div class="min-w-0 flex-1">
+                            <span id="viewSopCategory"
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mb-2">
+                                Category
+                            </span>
+                            <h3 class="text-xl sm:text-2xl font-bold text-gray-900 break-words" id="viewSopTitle">
+                                Article Title</h3>
+                            <p class="text-sm text-gray-500 mt-1" id="viewSopMeta">Last updated...</p>
+                        </div>
+                        <button type="button"
+                            class="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-500 focus:outline-none"
+                            onclick="closeViewModal()">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
                     </div>
-                    <button type="button" class="text-gray-400 hover:text-gray-500 focus:outline-none"
-                        onclick="closeViewModal()">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
                 </div>
 
                 <!-- Modal Body -->
-                <div class="px-8 py-8 h-[60vh] overflow-y-auto">
-                    <div class="prose max-w-none text-gray-700 leading-relaxed " id="viewSopContent">
+                <div class="px-4 py-6 sm:px-6 max-h-[60vh] overflow-y-auto">
+                    <div class="prose prose-blue max-w-none text-gray-700 leading-relaxed text-base"
+                        id="viewSopContent">
                         <!-- Content goes here -->
                     </div>
-                    <!-- Content goes here -->
+
+                    <!-- Attachments Section (JS populated) -->
+                    <div class="mt-6 pt-6 border-t border-gray-200" id="viewSopAttachmentsContainer"
+                        style="display: none;">
+                        <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Attachments</h4>
+                        <ul class="grid grid-cols-1 gap-3" id="viewSopAttachmentsList">
+                            <!-- Items injected here -->
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="bg-gray-50 px-4 py-4 sm:px-6 flex justify-end border-t border-gray-200">
+                    <button type="button"
+                        class="w-full sm:w-auto inline-flex justify-center rounded-xl border border-gray-300 shadow-sm px-6 py-2.5 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        onclick="closeViewModal()">Close</button>
                 </div>
             </div>
-
-            <!-- Attachments Section (JS populated) -->
-            <div class="px-8 pb-8" id="viewSopAttachmentsContainer" style="display: none;">
-                <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Attachments</h4>
-                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="viewSopAttachmentsList">
-                    <!-- Items injected here -->
-                </ul>
-            </div>
-
-            <!-- Modal Footer -->
-            <div class="bg-gray-50 px-8 py-4 flex justify-end">
-                <button type="button"
-                    class="inline-flex justify-center rounded-xl border border-gray-300 shadow-sm px-6 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
-                    onclick="closeViewModal()">Close</button>
-            </div>
         </div>
-    </div>
     </div>
 
     <!-- Preview Modal -->
@@ -284,15 +290,35 @@
         .ck-content ul,
         #viewSopContent ul {
             list-style-type: disc !important;
-            padding-left: 2rem !important;
-            margin-bottom: 1rem;
+            list-style-type: disc !important;
+            padding-left: 1.25rem !important;
+            /* Mobile friendly */
+        }
+
+        @media (min-width: 640px) {
+
+            .ck-content ul,
+            #viewSopContent ul {
+                padding-left: 2rem !important;
+            }
+        }
         }
 
         .ck-content ol,
         #viewSopContent ol {
             list-style-type: decimal !important;
-            padding-left: 2rem !important;
-            margin-bottom: 1rem;
+            list-style-type: decimal !important;
+            padding-left: 1.25rem !important;
+            /* Mobile friendly */
+        }
+
+        @media (min-width: 640px) {
+
+            .ck-content ol,
+            #viewSopContent ol {
+                padding-left: 2rem !important;
+            }
+        }
         }
 
         .ck-content h2,
