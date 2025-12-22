@@ -19,11 +19,41 @@
         </a>
 
         <a href="{{ route('projects.index') }}"
-            class="flex items-center px-6 py-3.5 transition-all duration-200 group {{ request()->routeIs('projects.*') ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600 hover:pl-7' }}">
+            class="flex items-center px-6 py-3.5 transition-all duration-200 group {{ request()->routeIs('projects.index') || request()->routeIs('projects.show') || request()->routeIs('projects.edit') ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600 hover:pl-7' }}">
             <i
-                class="fas fa-project-diagram w-6 text-center mr-3 {{ request()->routeIs('projects.*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-500' }}"></i>
+                class="fas fa-project-diagram w-6 text-center mr-3 {{ request()->routeIs('projects.index') || request()->routeIs('projects.show') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-500' }}"></i>
             <span class="font-medium">Projects</span>
         </a>
+
+        <!-- Kanban section with project list -->
+        <div x-data="{ kanbanOpen: {{ request()->routeIs('projects.kanban') ? 'true' : 'false' }} }">
+            <button @click="kanbanOpen = !kanbanOpen"
+                class="w-full flex items-center justify-between px-6 py-3.5 transition-all duration-200 group {{ request()->routeIs('projects.kanban') ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600' }}">
+                <div class="flex items-center">
+                    <i
+                        class="fas fa-columns w-6 text-center mr-3 {{ request()->routeIs('projects.kanban') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-500' }}"></i>
+                    <span class="font-medium">Kanban</span>
+                </div>
+                <i class="fas fa-chevron-down text-xs transition-transform duration-200"
+                    :class="kanbanOpen ? 'rotate-180' : ''"></i>
+            </button>
+            <div x-show="kanbanOpen" x-collapse class="bg-gray-50">
+                @php
+                    $userProjects = \App\Models\Project::with('kanbanBoard')->latest()->take(10)->get();
+                @endphp
+                @forelse($userProjects as $proj)
+                    <a href="{{ route('projects.kanban', $proj->id) }}"
+                        class="flex items-center px-6 pl-12 py-2.5 text-sm transition-all duration-200 {{ request()->is('projects/' . $proj->id . '/kanban') ? 'text-blue-700 bg-blue-50' : 'text-gray-500 hover:text-blue-600 hover:bg-white' }}">
+                        <i class="fas fa-grip-horizontal w-4 text-center mr-2 text-gray-400"></i>
+                        <span class="truncate">{{ Str::limit($proj->name, 20) }}</span>
+                    </a>
+                @empty
+                    <div class="px-6 pl-12 py-3 text-sm text-gray-400 italic">
+                        No projects yet
+                    </div>
+                @endforelse
+            </div>
+        </div>
 
         <a href="{{ route('invoices.index') }}"
             class="flex items-center px-6 py-3.5 transition-all duration-200 group {{ request()->routeIs('invoices.*') ? 'bg-blue-50 text-blue-700 border-r-4 border-blue-600' : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600 hover:pl-7' }}">

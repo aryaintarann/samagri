@@ -48,7 +48,7 @@
                             </span>
                             <span
                                 class="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wider
-                                                                                                                                    {{ $project->status === 'Completed' ? 'bg-green-100 text-green-800' : ($project->status === 'In Progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800') }}">
+                                                                                                                                        {{ $project->status === 'Completed' ? 'bg-green-100 text-green-800' : ($project->status === 'In Progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800') }}">
                                 {{ $project->status }}
                             </span>
                         </div>
@@ -101,6 +101,11 @@
                                 class="p-2 rounded-full text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition"
                                 title="View Details">
                                 <i class="fas fa-eye text-sm"></i>
+                            </a>
+                            <a href="{{ route('projects.kanban', $project->id) }}"
+                                class="p-2 rounded-full text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition"
+                                title="Kanban Board">
+                                <i class="fas fa-columns text-sm"></i>
                             </a>
                             <button onclick="editProject({{ $project->id }})"
                                 class="p-2 rounded-full text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 transition"

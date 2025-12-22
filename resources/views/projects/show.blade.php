@@ -4,10 +4,16 @@
             <h2 class="font-semibold text-2xl text-gray-800  leading-tight">
                 Project Details: <span class="text-blue-500">{{ $project->name }}</span>
             </h2>
-            <a href="{{ route('projects.index') }}"
-                class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded shadow transition transform hover:scale-105">
-                <i class="fas fa-arrow-left mr-2"></i> Back
-            </a>
+            <div class="flex items-center gap-3">
+                <a href="{{ route('projects.kanban', $project) }}"
+                    class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded shadow transition transform hover:scale-105">
+                    <i class="fas fa-columns mr-2"></i> Kanban Board
+                </a>
+                <a href="{{ route('projects.index') }}"
+                    class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded shadow transition transform hover:scale-105">
+                    <i class="fas fa-arrow-left mr-2"></i> Back
+                </a>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -94,7 +100,8 @@
                         @if($project->attachments->count() > 0)
                             <ul class="space-y-3">
                                 @foreach($project->attachments as $attachment)
-                                    <li class="flex items-center justify-between p-3 bg-gray-50 rounded-lg group hover:bg-gray-100 transition-colors">
+                                    <li
+                                        class="flex items-center justify-between p-3 bg-gray-50 rounded-lg group hover:bg-gray-100 transition-colors">
                                         <div class="flex items-center space-x-3 overflow-hidden">
                                             <div class="flex-shrink-0">
                                                 @if(Str::contains($attachment->file_type, 'image'))
@@ -106,10 +113,10 @@
                                                 @endif
                                             </div>
                                             <div class="min-w-0">
-                                                <button type="button" 
-                                                        onclick="openPreview('{{ route('attachments.show', $attachment->id) }}', '{{ $attachment->file_name }}', '{{ $attachment->file_type }}')"
-                                                        class="text-sm font-medium text-gray-900 truncate hover:text-blue-600 focus:outline-none text-left" 
-                                                        title="{{ $attachment->file_name }}">
+                                                <button type="button"
+                                                    onclick="openPreview('{{ route('attachments.show', $attachment->id) }}', '{{ $attachment->file_name }}', '{{ $attachment->file_type }}')"
+                                                    class="text-sm font-medium text-gray-900 truncate hover:text-blue-600 focus:outline-none text-left"
+                                                    title="{{ $attachment->file_name }}">
                                                     {{ $attachment->file_name }}
                                                 </button>
                                                 <p class="text-xs text-gray-500">
@@ -119,14 +126,13 @@
                                         </div>
                                         <div class="flex items-center space-x-2">
                                             <button type="button"
-                                                    onclick="openPreview('{{ route('attachments.show', $attachment->id) }}', '{{ $attachment->file_name }}', '{{ $attachment->file_type }}')"
-                                                    class="text-gray-400 hover:text-blue-600 transition-colors p-1"
-                                                    title="Preview">
+                                                onclick="openPreview('{{ route('attachments.show', $attachment->id) }}', '{{ $attachment->file_name }}', '{{ $attachment->file_type }}')"
+                                                class="text-gray-400 hover:text-blue-600 transition-colors p-1" title="Preview">
                                                 <i class="fas fa-eye"></i>
                                             </button>
-                                            <a href="{{ route('attachments.show', $attachment->id) }}?download=1" 
-                                               class="text-gray-400 hover:text-green-600 transition-colors p-1"
-                                               title="Download">
+                                            <a href="{{ route('attachments.show', $attachment->id) }}?download=1"
+                                                class="text-gray-400 hover:text-green-600 transition-colors p-1"
+                                                title="Download">
                                                 <i class="fas fa-download"></i>
                                             </a>
                                         </div>
