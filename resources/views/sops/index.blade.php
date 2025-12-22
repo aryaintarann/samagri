@@ -159,7 +159,7 @@
                                     class="block text-sm font-medium text-gray-700 mb-2">Content</label>
                                 <textarea name="content" id="content" rows="12"
                                     class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                                    required placeholder="Write your article content here..."></textarea>
+                                    placeholder="Write your article content here..."></textarea>
                             </div>
 
                             <div>
@@ -219,27 +219,29 @@
 
                 <!-- Modal Body -->
                 <div class="px-8 py-8 h-[60vh] overflow-y-auto">
-                    <div class="prose max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap" id="viewSopContent">
+                    <div class="prose max-w-none text-gray-700 leading-relaxed " id="viewSopContent">
                         <!-- Content goes here -->
                     </div>
-                </div>
-
-                <!-- Attachments Section (JS populated) -->
-                <div class="px-8 pb-8" id="viewSopAttachmentsContainer" style="display: none;">
-                    <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Attachments</h4>
-                    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="viewSopAttachmentsList">
-                        <!-- Items injected here -->
-                    </ul>
-                </div>
-
-                <!-- Modal Footer -->
-                <div class="bg-gray-50 px-8 py-4 flex justify-end">
-                    <button type="button"
-                        class="inline-flex justify-center rounded-xl border border-gray-300 shadow-sm px-6 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
-                        onclick="closeViewModal()">Close</button>
+                    <!-- Content goes here -->
                 </div>
             </div>
+
+            <!-- Attachments Section (JS populated) -->
+            <div class="px-8 pb-8" id="viewSopAttachmentsContainer" style="display: none;">
+                <h4 class="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Attachments</h4>
+                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="viewSopAttachmentsList">
+                    <!-- Items injected here -->
+                </ul>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="bg-gray-50 px-8 py-4 flex justify-end">
+                <button type="button"
+                    class="inline-flex justify-center rounded-xl border border-gray-300 shadow-sm px-6 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
+                    onclick="closeViewModal()">Close</button>
+            </div>
         </div>
+    </div>
     </div>
 
     <!-- Preview Modal -->
@@ -278,7 +280,65 @@
         </div>
     </div>
 
+    <style>
+        .ck-content ul,
+        #viewSopContent ul {
+            list-style-type: disc !important;
+            padding-left: 2rem !important;
+            margin-bottom: 1rem;
+        }
+
+        .ck-content ol,
+        #viewSopContent ol {
+            list-style-type: decimal !important;
+            padding-left: 2rem !important;
+            margin-bottom: 1rem;
+        }
+
+        .ck-content h2,
+        #viewSopContent h2 {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+        }
+
+        .ck-content h3,
+        #viewSopContent h3 {
+            font-size: 1.25em;
+            font-weight: bold;
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+        }
+
+        .ck-content p,
+        #viewSopContent p {
+            margin-bottom: 0.75em;
+        }
+
+        .ck-content blockquote,
+        #viewSopContent blockquote {
+            border-left: 4px solid #e5e7eb;
+            padding-left: 1rem;
+            font-style: italic;
+        }
+    </style>
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
     <script>
+        let editorInstance;
+
+        // Initialize CKEditor
+        ClassicEditor
+            .create(document.querySelector('#content'), {
+                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'insertTable', '|', 'undo', 'redo']
+            })
+            .then(editor => {
+                editorInstance = editor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
         // Search Functionality
         function filterCards() {
             const input = document.getElementById('searchInput');
@@ -311,13 +371,19 @@
                 document.getElementById('sopId').value = '';
                 document.getElementById('category').value = 'General';
                 document.getElementById('is_required').checked = false;
+                if (editorInstance) {
+                    editorInstance.setData('');
+                }
             } else if (mode === 'edit' && data) {
                 title.innerText = 'Edit Article';
                 document.getElementById('sopId').value = data.id;
                 document.getElementById('title').value = data.title;
-                document.getElementById('content').value = data.content;
+                // document.getElementById('content').value = data.content; // Handled by editor
                 document.getElementById('category').value = data.category || 'General';
                 document.getElementById('is_required').checked = data.is_required == 1; // == 1 handles true/1
+                if (editorInstance) {
+                    editorInstance.setData(data.content || '');
+                }
             }
         }
 
@@ -331,6 +397,17 @@
 
         async function submitSop(event) {
             event.preventDefault();
+
+            // Sync CKEditor data
+            if (editorInstance) {
+                const data = editorInstance.getData();
+                if (!data) {
+                    Swal.fire('Error', 'Content cannot be empty', 'error');
+                    return;
+                }
+                document.querySelector('#content').value = data;
+            }
+
             const form = document.getElementById('sopForm');
             const formData = new FormData(form);
             const id = formData.get('id');
@@ -411,7 +488,7 @@
 
                 document.getElementById('viewSopTitle').innerText = data.title;
                 document.getElementById('viewSopCategory').innerText = data.category || 'General';
-                document.getElementById('viewSopContent').innerText = data.content;
+                document.getElementById('viewSopContent').innerHTML = data.content; // innerHTML for rich text components
                 document.getElementById('viewSopMeta').innerText = 'Last updated ' + new Date(data.updated_at).toLocaleDateString();
 
                 // Attachments
@@ -475,7 +552,7 @@
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch(`/ sops / ${id} `, {
+                    fetch(`/sops/${id}`, { // Fixed spacing
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -528,4 +605,5 @@
             document.getElementById('previewContent').innerHTML = '';
         }
     </script>
+
 </x-app-layout>
