@@ -34,4 +34,12 @@ class Project extends Model
     {
         return $this->hasMany(Invoice::class);
     }
+
+    /**
+     * Get the Kanban board for this project.
+     */
+    public function kanbanBoard(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(KanbanBoard::class);
+    }
 }

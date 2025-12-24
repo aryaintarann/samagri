@@ -47,4 +47,28 @@ Route::middleware('auth')->group(function () {
     Route::get('/attachments/{attachment}', [AttachmentController::class, 'show'])->name('attachments.show');
 });
 
+// Kanban Routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/projects/{project}/kanban', [\App\Http\Controllers\KanbanController::class, 'show'])->name('projects.kanban');
+
+    Route::prefix('kanban')->group(function () {
+        Route::post('/columns', [\App\Http\Controllers\KanbanController::class, 'storeColumn'])->name('kanban.columns.store');
+        Route::put('/columns/{column}', [\App\Http\Controllers\KanbanController::class, 'updateColumn'])->name('kanban.columns.update');
+        Route::delete('/columns/{column}', [\App\Http\Controllers\KanbanController::class, 'destroyColumn'])->name('kanban.columns.destroy');
+        Route::post('/columns/reorder', [\App\Http\Controllers\KanbanController::class, 'reorderColumns'])->name('kanban.columns.reorder');
+
+        Route::get('/cards/{card}', [\App\Http\Controllers\KanbanController::class, 'getCard'])->name('kanban.cards.show');
+        Route::post('/cards', [\App\Http\Controllers\KanbanController::class, 'storeCard'])->name('kanban.cards.store');
+        Route::post('/cards/{card}', [\App\Http\Controllers\KanbanController::class, 'updateCard'])->name('kanban.cards.update');
+        Route::delete('/cards/{card}', [\App\Http\Controllers\KanbanController::class, 'destroyCard'])->name('kanban.cards.destroy');
+        Route::post('/cards/move', [\App\Http\Controllers\KanbanController::class, 'moveCard'])->name('kanban.cards.move');
+
+        Route::delete('/attachments/{attachment}', [\App\Http\Controllers\KanbanController::class, 'destroyAttachment'])->name('kanban.attachments.destroy');
+
+        // Comments
+        Route::post('/cards/{card}/comments', [\App\Http\Controllers\KanbanController::class, 'storeComment'])->name('kanban.comments.store');
+        Route::delete('/comments/{comment}', [\App\Http\Controllers\KanbanController::class, 'destroyComment'])->name('kanban.comments.destroy');
+    });
+});
+
 require __DIR__ . '/auth.php';

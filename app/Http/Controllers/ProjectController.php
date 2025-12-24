@@ -76,6 +76,10 @@ class ProjectController extends Controller
 
         $project = Project::create($validated);
 
+        // Create Kanban board with default columns
+        $board = $project->kanbanBoard()->create(['name' => $project->name . ' Board']);
+        $board->createDefaultColumns();
+
         $this->logActivity('Created Project', 'Created project: ' . $project->name);
 
         // Handle Attachments
