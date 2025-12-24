@@ -56,7 +56,28 @@ class ProjectDocumentController extends Controller
 
         $validated = $request->validate([
             'category' => 'required|in:quotation,spk,bast,srd',
-            'file' => 'required|file|max:20480|mimes:pdf,doc,docx,xls,xlsx',
+            'file' => [
+                'required',
+                'file',
+                'max:20480',
+                function ($attribute, $value, $fail) {
+                    $allowedMimes = [
+                        'application/pdf',
+                        'application/msword', // .doc
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+                        'application/vnd.ms-excel', // .xls
+                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+                    ];
+                    $allowedExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx'];
+
+                    $extension = strtolower($value->getClientOriginalExtension());
+                    $mimeType = $value->getMimeType();
+
+                    if (!in_array($extension, $allowedExtensions)) {
+                        $fail('The file must be a PDF, Word, or Excel document.');
+                    }
+                },
+            ],
         ]);
 
         $file = $request->file('file');

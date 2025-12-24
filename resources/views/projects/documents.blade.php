@@ -216,6 +216,12 @@
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            const fileInput = document.getElementById('uploadFile');
+            if (!fileInput.files.length) {
+                Swal.fire('Error', 'Please select a file to upload', 'warning');
+                return;
+            }
+
             const btn = document.getElementById('uploadBtn');
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Uploading...';
@@ -245,7 +251,14 @@
                     });
                 } else {
                     const error = await response.json();
-                    Swal.fire('Error', error.message || 'Failed to upload document', 'error');
+                    // Handle validation errors
+                    let errorMsg = 'Failed to upload document';
+                    if (error.errors) {
+                        errorMsg = Object.values(error.errors).flat().join('\n');
+                    } else if (error.message) {
+                        errorMsg = error.message;
+                    }
+                    Swal.fire('Error', errorMsg, 'error');
                 }
             } catch (err) {
                 console.error(err);
