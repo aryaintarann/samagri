@@ -42,4 +42,12 @@ class Project extends Model
     {
         return $this->hasOne(KanbanBoard::class);
     }
+
+    /**
+     * Get the documents for this project.
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(ProjectDocument::class);
+    }
 }
