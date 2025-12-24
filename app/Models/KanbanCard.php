@@ -51,4 +51,12 @@ class KanbanCard extends Model
             default => 'bg-gray-100 text-gray-800',
         };
     }
+
+    /**
+     * Get the comments for this card.
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(KanbanCardComment::class, 'card_id')->orderBy('created_at', 'desc');
+    }
 }

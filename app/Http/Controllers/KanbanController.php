@@ -7,7 +7,9 @@ use App\Models\KanbanBoard;
 use App\Models\KanbanColumn;
 use App\Models\KanbanCard;
 use App\Models\KanbanCardAttachment;
+use App\Models\KanbanCardComment;
 use App\Models\User;
+use App\Notifications\KanbanCardAssigned;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -141,9 +143,31 @@ class KanbanController extends Controller
             'position' => $maxPosition + 1,
         ]);
 
-        // Sync assignees
+        // Sync assignees and send notifications
         if (!empty($validated['assignees'])) {
             $card->assignees()->sync($validated['assignees']);
+
+            // Send notifications to assignees
+            $assignedBy = auth()->user() ? auth()->user()->name : 'System';
+            $assignees = User::whereIn('id', $validated['assignees'])->get();
+
+            \Log::info('Sending notifications to assignees', [
+                'card_id' => $card->id,
+                'assignees_count' => $assignees->count(),
+                'current_user' => auth()->id()
+            ]);
+
+            foreach ($assignees as $assignee) {
+                try {
+                    $assignee->notify(new KanbanCardAssigned($card, $assignedBy));
+                    \Log::info('Notification sent to user', ['user_id' => $assignee->id]);
+                } catch (\Exception $e) {
+                    \Log::error('Failed to send notification', [
+                        'user_id' => $assignee->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
         }
 
         // Handle attachments
@@ -177,10 +201,24 @@ class KanbanController extends Controller
      */
     public function getCard(KanbanCard $card)
     {
-        $card->load(['assignees', 'attachments']);
+        $card->load(['assignees', 'attachments', 'comments.user']);
+
+        // Format comments for frontend
+        $formattedComments = $card->comments->map(function ($comment) {
+            return [
+                'id' => $comment->id,
+                'content' => $comment->content,
+                'created_at' => $comment->created_at->diffForHumans(),
+                'user' => [
+                    'id' => $comment->user->id,
+                    'name' => $comment->user->name,
+                ],
+            ];
+        });
 
         return response()->json([
             'card' => $card,
+            'comments' => $formattedComments,
         ]);
     }
 
@@ -209,8 +247,28 @@ class KanbanController extends Controller
             'color' => $validated['color'] ?? null,
         ]);
 
+        // Get current assignees before update
+        $currentAssigneeIds = $card->assignees->pluck('id')->toArray();
+        $newAssigneeIds = $validated['assignees'] ?? [];
+
+        // Find newly added assignees (those in new list but not in current)
+        $addedAssigneeIds = array_diff($newAssigneeIds, $currentAssigneeIds);
+
         // Sync assignees
-        $card->assignees()->sync($validated['assignees'] ?? []);
+        $card->assignees()->sync($newAssigneeIds);
+
+        // Send notifications to NEW assignees only
+        if (!empty($addedAssigneeIds)) {
+            $assignedBy = auth()->user() ? auth()->user()->name : 'System';
+            $newAssignees = User::whereIn('id', $addedAssigneeIds)->get();
+
+            foreach ($newAssignees as $assignee) {
+                // Don't notify the user who is editing the card
+                if (auth()->id() !== $assignee->id) {
+                    $assignee->notify(new KanbanCardAssigned($card, $assignedBy));
+                }
+            }
+        }
 
         // Handle new attachments
         if ($request->hasFile('attachments')) {
@@ -307,6 +365,53 @@ class KanbanController extends Controller
         return response()->json([
             'message' => 'Card moved successfully',
             'card' => $card->fresh()->load(['assignees', 'attachments']),
+        ]);
+    }
+
+    /**
+     * Store a new comment for a card.
+     */
+    public function storeComment(Request $request, KanbanCard $card)
+    {
+        $validated = $request->validate([
+            'content' => 'required|string|max:5000',
+        ]);
+
+        $comment = $card->comments()->create([
+            'user_id' => auth()->id(),
+            'content' => $validated['content'],
+        ]);
+
+        $comment->load('user');
+
+        return response()->json([
+            'message' => 'Comment added successfully',
+            'comment' => [
+                'id' => $comment->id,
+                'content' => $comment->content,
+                'created_at' => $comment->created_at->diffForHumans(),
+                'user' => [
+                    'id' => $comment->user->id,
+                    'name' => $comment->user->name,
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * Delete a comment.
+     */
+    public function destroyComment(KanbanCardComment $comment)
+    {
+        // Only the comment owner or admin can delete
+        if (auth()->id() !== $comment->user_id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $comment->delete();
+
+        return response()->json([
+            'message' => 'Comment deleted successfully',
         ]);
     }
 }

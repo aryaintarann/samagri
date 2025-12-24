@@ -90,13 +90,31 @@
                             </div>
                             <div class="max-h-64 overflow-y-auto">
                                 @forelse(auth()->user()->unreadNotifications as $notification)
-                                    <div @click="fetch('{{ route('notifications.read', $notification->id) }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } }).then(() => { window.location.href = '#'; /* Add link to project if needed */ })"
-                                        class="block px-4 py-3 hover:bg-gray-50 transition border-b border-gray-50 last:border-0 relative group cursor-pointer">
+                                    @php
+                                        $url = $notification->data['url'] ?? '#';
+                                        $type = $notification->data['type'] ?? 'default';
+                                        $icon = match($type) {
+                                            'kanban_card_assigned' => 'fa-clipboard-list',
+                                            'project_assigned' => 'fa-briefcase',
+                                            'invoice_created', 'invoice_paid' => 'fa-file-invoice-dollar',
+                                            'sop_created' => 'fa-book',
+                                            default => 'fa-bell'
+                                        };
+                                        $color = match($type) {
+                                            'kanban_card_assigned' => 'bg-blue-100 text-blue-600',
+                                            'project_assigned' => 'bg-indigo-100 text-indigo-600',
+                                            'invoice_created', 'invoice_paid' => 'bg-green-100 text-green-600',
+                                            'sop_created' => 'bg-purple-100 text-purple-600',
+                                            default => 'bg-gray-100 text-gray-600'
+                                        };
+                                    @endphp
+                                    <a href="{{ $url }}" 
+                                        @click="fetch('{{ route('notifications.read', $notification->id) }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } })"
+                                        class="block px-4 py-3 hover:bg-gray-50 transition border-b border-gray-50 last:border-0 relative group">
                                         <div class="flex items-start">
                                             <div class="flex-shrink-0 mt-1">
-                                                <div
-                                                    class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
-                                                    <i class="fas fa-briefcase text-xs"></i>
+                                                <div class="h-8 w-8 rounded-full {{ $color }} flex items-center justify-center">
+                                                    <i class="fas {{ $icon }} text-xs"></i>
                                                 </div>
                                             </div>
                                             <div class="ml-3 w-0 flex-1">
@@ -107,13 +125,13 @@
                                             </div>
                                             <div class="ml-auto pl-3">
                                                 <button
-                                                    @click.stop="fetch('{{ route('notifications.read', $notification->id) }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } }).then(() => { window.location.reload(); })"
+                                                    @click.stop.prevent="fetch('{{ route('notifications.read', $notification->id) }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } }).then(() => { window.location.reload(); })"
                                                     class="text-gray-400 hover:text-indigo-600" title="Mark as read">
                                                     <i class="fas fa-check text-xs"></i>
                                                 </button>
                                             </div>
                                         </div>
-                                    </div>
+                                    </a>
                                 @empty
                                     <div class="px-4 py-8 text-center text-gray-500">
                                         <i class="far fa-bell-slash text-2xl text-gray-300 mb-2 block"></i>

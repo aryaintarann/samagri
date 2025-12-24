@@ -64,6 +64,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/cards/move', [\App\Http\Controllers\KanbanController::class, 'moveCard'])->name('kanban.cards.move');
 
         Route::delete('/attachments/{attachment}', [\App\Http\Controllers\KanbanController::class, 'destroyAttachment'])->name('kanban.attachments.destroy');
+
+        // Comments
+        Route::post('/cards/{card}/comments', [\App\Http\Controllers\KanbanController::class, 'storeComment'])->name('kanban.comments.store');
+        Route::delete('/comments/{comment}', [\App\Http\Controllers\KanbanController::class, 'destroyComment'])->name('kanban.comments.destroy');
     });
 });
 
