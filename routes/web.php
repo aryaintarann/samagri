@@ -71,4 +71,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
+// Project Documents Routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/projects/{project}/documents', [\App\Http\Controllers\ProjectDocumentController::class, 'index'])->name('projects.documents.index');
+    Route::post('/projects/{project}/documents', [\App\Http\Controllers\ProjectDocumentController::class, 'store'])->name('projects.documents.store');
+    Route::get('/projects/{project}/documents/{document}/download', [\App\Http\Controllers\ProjectDocumentController::class, 'download'])->name('projects.documents.download');
+    Route::delete('/projects/{project}/documents/{document}', [\App\Http\Controllers\ProjectDocumentController::class, 'destroy'])->name('projects.documents.destroy');
+});
+
 require __DIR__ . '/auth.php';
