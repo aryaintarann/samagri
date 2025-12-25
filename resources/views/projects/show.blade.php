@@ -32,8 +32,8 @@
                             <span class="block text-sm text-gray-500 ">Status</span>
                             <span
                                 class="inline-block px-3 py-1 mt-1 font-semibold text-sm rounded-full 
-                                {{ $project->status === 'Completed' ? 'bg-green-100 text-green-800' : ($project->status === 'In Progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800') }}">
-                                {{ $project->status }}
+                                {{ $project->status === \App\Enums\ProjectStatus::COMPLETED ? 'bg-green-100 text-green-800' : ($project->status === \App\Enums\ProjectStatus::IN_PROGRESS ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800') }}">
+                                {{ $project->status->label() }}
                             </span>
                         </div>
                         <div>

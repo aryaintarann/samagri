@@ -290,12 +290,12 @@
                             <span></span>
                         </span>
                         <span id="viewCardDueDate"
-                            class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-600 hidden">
+                            class="items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-600 hidden">
                             <i class="far fa-calendar text-[10px]"></i>
                             <span></span>
                         </span>
                         <span id="viewCardAttachmentCount"
-                            class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-600 hidden">
+                            class="items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-600 hidden">
                             <i class="fas fa-paperclip text-[10px]"></i>
                             <span></span>
                         </span>
@@ -708,8 +708,10 @@
                 const date = new Date(card.due_date);
                 dueDateEl.querySelector('span').textContent = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                 dueDateEl.classList.remove('hidden');
+                dueDateEl.classList.add('inline-flex');
             } else {
                 dueDateEl.classList.add('hidden');
+                dueDateEl.classList.remove('inline-flex');
             }
 
             // Attachment Count Badge
@@ -717,8 +719,10 @@
             if (card.attachments && card.attachments.length > 0) {
                 attachCountEl.querySelector('span').textContent = `${card.attachments.length} file${card.attachments.length > 1 ? 's' : ''}`;
                 attachCountEl.classList.remove('hidden');
+                attachCountEl.classList.add('inline-flex');
             } else {
                 attachCountEl.classList.add('hidden');
+                attachCountEl.classList.remove('inline-flex');
             }
 
             // Description (render as HTML from Quill)
