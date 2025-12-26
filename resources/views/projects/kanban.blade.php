@@ -58,9 +58,13 @@
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-2 flex-wrap">
                                             @if ($card->priority)
-                                                <span class="text-xs px-2 py-0.5 rounded-full {{ $card->priority_color }}">
-                                                    {{ ucfirst($card->priority) }}
-                                                </span>
+                                                                            @php
+                                                                                $priorityEnum = \App\Enums\KanbanCardPriority::tryFrom($card->priority);
+                                                                            @endphp
+                                                 <span
+                                                                                class="text-xs px-2 py-0.5 rounded-full {{ $priorityEnum?->color() ?? 'bg-gray-100' }}">
+                                                                                {{ $priorityEnum?->label() ?? ucfirst($card->priority) }}
+                                                                            </span>
                                             @endif
                                             @if ($card->due_date)
                                                 <span class="text-xs text-gray-500">
@@ -290,12 +294,12 @@
                             <span></span>
                         </span>
                         <span id="viewCardDueDate"
-                            class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-600 hidden">
+                            class="items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-600 hidden">
                             <i class="far fa-calendar text-[10px]"></i>
                             <span></span>
                         </span>
                         <span id="viewCardAttachmentCount"
-                            class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-600 hidden">
+                            class="items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-600 hidden">
                             <i class="fas fa-paperclip text-[10px]"></i>
                             <span></span>
                         </span>
@@ -699,8 +703,11 @@
                 'medium': 'bg-amber-100 text-amber-700',
                 'low': 'bg-emerald-100 text-emerald-700'
             };
-            priorityEl.className = `inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium ${priorityColors[card.priority] || 'bg-gray-100 text-gray-700'}`;
-            priorityEl.querySelector('span').textContent = card.priority ? card.priority.charAt(0).toUpperCase() + card.priority.slice(1) : 'Medium';
+            const priorityLabel = card.priority ? card.priority.charAt(0).toUpperCase() + card.priority.slice(1) : 'Medium';
+            const priorityColor = priorityColors[card.priority] || 'bg-gray-100 text-gray-700';
+
+            priorityEl.className = `inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium ${priorityColor}`;
+            priorityEl.querySelector('span').textContent = priorityLabel;
 
             // Due Date
             const dueDateEl = document.getElementById('viewCardDueDate');
@@ -708,8 +715,10 @@
                 const date = new Date(card.due_date);
                 dueDateEl.querySelector('span').textContent = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                 dueDateEl.classList.remove('hidden');
+                dueDateEl.classList.add('inline-flex');
             } else {
                 dueDateEl.classList.add('hidden');
+                dueDateEl.classList.remove('inline-flex');
             }
 
             // Attachment Count Badge
@@ -717,8 +726,10 @@
             if (card.attachments && card.attachments.length > 0) {
                 attachCountEl.querySelector('span').textContent = `${card.attachments.length} file${card.attachments.length > 1 ? 's' : ''}`;
                 attachCountEl.classList.remove('hidden');
+                attachCountEl.classList.add('inline-flex');
             } else {
                 attachCountEl.classList.add('hidden');
+                attachCountEl.classList.remove('inline-flex');
             }
 
             // Description (render as HTML from Quill)

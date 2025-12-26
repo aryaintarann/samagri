@@ -13,6 +13,7 @@ class Project extends Model
     protected $casts = [
         'deadline' => 'date',
         'active' => 'boolean',
+        'status' => \App\Enums\ProjectStatus::class,
     ];
 
     public function client(): BelongsTo
@@ -49,5 +50,10 @@ class Project extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(ProjectDocument::class);
+    }
+
+    public function scopeWithRelations($query)
+    {
+        return $query->with(['client', 'users']);
     }
 }

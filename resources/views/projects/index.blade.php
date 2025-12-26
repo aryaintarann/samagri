@@ -48,8 +48,8 @@
                             </span>
                             <span
                                 class="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wider
-                                                                                                                                        {{ $project->status === 'Completed' ? 'bg-green-100 text-green-800' : ($project->status === 'In Progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800') }}">
-                                {{ $project->status }}
+                                                                                                                                                {{ $project->status === \App\Enums\ProjectStatus::COMPLETED ? 'bg-green-100 text-green-800' : ($project->status === \App\Enums\ProjectStatus::IN_PROGRESS ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800') }}">
+                                {{ $project->status->label() }}
                             </span>
                         </div>
 
@@ -199,10 +199,10 @@
                                     <select name="status" id="status"
                                         class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-3"
                                         required>
-                                        <option value="Not Started">Not Started</option>
+                                        <option value="Pending">Pending</option>
                                         <option value="In Progress">In Progress</option>
                                         <option value="Completed">Completed</option>
-                                        <option value="On Hold">On Hold</option>
+                                        <option value="Cancelled">Cancelled</option>
                                     </select>
                                 </div>
                             </div>
