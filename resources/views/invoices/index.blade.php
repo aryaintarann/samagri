@@ -50,10 +50,9 @@
                                     {{ $invoice->invoice_number }}
                                 </h3>
                             </div>
-                            <span
-                                class="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wider
-                                            {{ $invoice->status === 'Paid' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                {{ $invoice->status }}
+                            <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wider
+                                                {{ $invoice->status?->color() ?? 'bg-gray-100 text-gray-800' }}">
+                                {{ $invoice->status?->label() ?? $invoice->status }}
                             </span>
                         </div>
 
@@ -156,6 +155,8 @@
                                         class="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-3">
                                         <option value="Pending">Pending</option>
                                         <option value="Paid">Paid</option>
+                                        <option value="Overdue">Overdue</option>
+                                        <option value="Cancelled">Cancelled</option>
                                     </select>
                                 </div>
                             </div>

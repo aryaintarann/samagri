@@ -11,6 +11,7 @@ class Invoice extends Model
 
     protected $casts = [
         'due_date' => 'date',
+        'status' => \App\Enums\InvoiceStatus::class,
     ];
 
     public function project(): BelongsTo

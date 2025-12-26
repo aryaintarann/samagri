@@ -58,9 +58,13 @@
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-2 flex-wrap">
                                             @if ($card->priority)
-                                                <span class="text-xs px-2 py-0.5 rounded-full {{ $card->priority_color }}">
-                                                    {{ ucfirst($card->priority) }}
-                                                </span>
+                                                                            @php
+                                                                                $priorityEnum = \App\Enums\KanbanCardPriority::tryFrom($card->priority);
+                                                                            @endphp
+                                                 <span
+                                                                                class="text-xs px-2 py-0.5 rounded-full {{ $priorityEnum?->color() ?? 'bg-gray-100' }}">
+                                                                                {{ $priorityEnum?->label() ?? ucfirst($card->priority) }}
+                                                                            </span>
                                             @endif
                                             @if ($card->due_date)
                                                 <span class="text-xs text-gray-500">
@@ -699,8 +703,11 @@
                 'medium': 'bg-amber-100 text-amber-700',
                 'low': 'bg-emerald-100 text-emerald-700'
             };
-            priorityEl.className = `inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium ${priorityColors[card.priority] || 'bg-gray-100 text-gray-700'}`;
-            priorityEl.querySelector('span').textContent = card.priority ? card.priority.charAt(0).toUpperCase() + card.priority.slice(1) : 'Medium';
+            const priorityLabel = card.priority ? card.priority.charAt(0).toUpperCase() + card.priority.slice(1) : 'Medium';
+            const priorityColor = priorityColors[card.priority] || 'bg-gray-100 text-gray-700';
+
+            priorityEl.className = `inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium ${priorityColor}`;
+            priorityEl.querySelector('span').textContent = priorityLabel;
 
             // Due Date
             const dueDateEl = document.getElementById('viewCardDueDate');

@@ -2,15 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Invoices\StoreInvoiceRequest;
+use App\Http\Requests\Invoices\UpdateInvoiceRequest;
 use App\Models\Invoice;
 use App\Models\Project;
+use App\Services\InvoiceService;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf;
-use App\Traits\LogsActivity;
 
 class InvoiceController extends Controller
 {
-    use LogsActivity;
+    protected InvoiceService $invoiceService;
+
+    public function __construct(InvoiceService $invoiceService)
+    {
+        $this->invoiceService = $invoiceService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -32,25 +39,9 @@ class InvoiceController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreInvoiceRequest $request)
     {
-        $validated = $request->validate([
-            'project_id' => 'required|exists:projects,id',
-            'amount' => 'required|numeric',
-            'status' => 'required|string',
-            'due_date' => 'nullable|date',
-        ]);
-
-        // Generate Invoice Number (Simple logic)
-        $validated['invoice_number'] = 'INV-' . time();
-
-        $invoice = Invoice::create($validated);
-        $this->logActivity('Created Invoice', 'Created invoice ' . $invoice->invoice_number . ' for project: ' . $invoice->project->name);
-
-        // Send Email Notification to Client
-        if ($invoice->project->client && $invoice->project->client->email) {
-            $invoice->project->client->notify(new \App\Notifications\InvoiceCreated($invoice));
-        }
+        $invoice = $this->invoiceService->createInvoice($request->validated());
 
         if ($request->ajax()) {
             return response()->json(['message' => 'Invoice created successfully', 'invoice' => $invoice]);
@@ -85,25 +76,12 @@ class InvoiceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Invoice $invoice)
+    public function update(UpdateInvoiceRequest $request, Invoice $invoice)
     {
-        $validated = $request->validate([
-            'project_id' => 'required|exists:projects,id',
-            'amount' => 'required|numeric',
-            'status' => 'required|string',
-            'due_date' => 'nullable|date',
-        ]);
-
-        $invoice->update($validated);
-        $this->logActivity('Updated Invoice', 'Updated invoice ' . $invoice->invoice_number . ' status to: ' . $invoice->status);
-
-        // Send Email Notification if Paid
-        if ($validated['status'] === 'Paid' && $invoice->project->client && $invoice->project->client->email) {
-            $invoice->project->client->notify(new \App\Notifications\InvoicePaid($invoice));
-        }
+        $updatedInvoice = $this->invoiceService->updateInvoice($invoice, $request->validated());
 
         if ($request->ajax()) {
-            return response()->json(['message' => 'Invoice updated successfully', 'invoice' => $invoice]);
+            return response()->json(['message' => 'Invoice updated successfully', 'invoice' => $updatedInvoice]);
         }
 
         return redirect()->route('invoices.index')->with('success', 'Invoice updated successfully.');
@@ -114,9 +92,7 @@ class InvoiceController extends Controller
      */
     public function destroy(Invoice $invoice)
     {
-        $number = $invoice->invoice_number;
-        $invoice->delete();
-        $this->logActivity('Deleted Invoice', 'Deleted invoice: ' . $number);
+        $this->invoiceService->deleteInvoice($invoice);
 
         if (request()->ajax()) {
             return response()->json(['message' => 'Invoice deleted successfully']);
@@ -127,7 +103,7 @@ class InvoiceController extends Controller
 
     public function download(Invoice $invoice)
     {
-        $pdf = Pdf::loadView('invoices.pdf', compact('invoice'));
+        $pdf = $this->invoiceService->generatePdf($invoice);
         return $pdf->stream('invoice-' . $invoice->invoice_number . '.pdf');
     }
 }
